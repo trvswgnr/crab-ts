@@ -496,8 +496,6 @@ function _None(): Optional<any> {
 declare const None: Optional<any>;
 Object.defineProperty(exports, 'None', { get: _None });
 
-type SomeValue<T> = T extends null | undefined | Optional<null> ? never : T;
-
 /**
  * Some value of type `T`.
  */
@@ -518,6 +516,8 @@ function Some<T>(value: SomeValue<T>): Optional<T> {
 
     return new Optional(value);
 }
+
+type SomeValue<T> = T extends null | undefined | Optional<null> ? never : T;
 
 /**
  * Returns {@link Some `Some(value)`} if `value` is not null or undefined,
