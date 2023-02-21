@@ -9,7 +9,7 @@ describe('Optional', () => {
         });
 
         it('Returns `false` if the option is a `None` value.', () => {
-            const x: Optional<number> = None();
+            const x: Optional<number> = None;
             expect(x.isSome()).toBe(false);
         });
     });
@@ -26,19 +26,19 @@ describe('Optional', () => {
         });
 
         it('Returns `false` if the option is a `None`.', () => {
-            const x: Optional<number> = None();
+            const x: Optional<number> = None;
             expect(x.isSomeAnd((x) => x > 1)).toBe(false);
         });
     });
 
-    describe('isNone()', () => {
+    describe('isNone', () => {
         it('Returns `false` if the option is a `Some` value.', () => {
             const x: Optional<number> = Some(2);
             expect(x.isNone()).toBe(false);
         });
 
         it('Returns `true` if the option is a `None` value.', () => {
-            const x: Optional<number> = None();
+            const x: Optional<number> = None;
             expect(x.isNone()).toBe(true);
         });
     });
@@ -50,7 +50,7 @@ describe('Optional', () => {
         });
 
         it('Panics if the value is a `None` with a custom panic message provided by `msg`.', () => {
-            const x: Optional<string> = None();
+            const x: Optional<string> = None;
             expect(() => x.expect('fruits are healthy')).toThrowError('fruits are healthy');
         });
     });
@@ -62,7 +62,7 @@ describe('Optional', () => {
         });
 
         it('Panics if the self value equals `None`.', () => {
-            const x: Optional<string> = None();
+            const x: Optional<string> = None;
             expect(() => x.unwrap()).toThrowError();
         });
     });
@@ -74,7 +74,7 @@ describe('Optional', () => {
         });
 
         it('Returns a provided default if the self value equals `None`.', () => {
-            const x: Optional<string> = None();
+            const x: Optional<string> = None;
             expect(x.unwrapOr('bike')).toBe('bike');
         });
     });
@@ -88,7 +88,7 @@ describe('Optional', () => {
 
         it('Computes a default value if the self value equals `None`.', () => {
             const k = 10;
-            const x: Optional<number> = None();
+            const x: Optional<number> = None;
             expect(x.unwrapOrElse(() => 2 * k)).toBe(20);
         });
     });
@@ -121,7 +121,7 @@ describe('Optional', () => {
 
             expect(y).toBe(4);
             expect(x).toEqual(Some(4));
-            expect(x2).toEqual(None());
+            expect(x2).toEqual(None);
         });
     });
 
@@ -132,8 +132,8 @@ describe('Optional', () => {
             expect(x.mapOr(42, (v) => v.length)).toBe(3);
         });
 
-        it('Returns the provided default result if None().', () => {
-            const x: Optional<string> = None();
+        it('Returns the provided default result if None.', () => {
+            const x: Optional<string> = None;
             expect(x.mapOr(42, (v) => v.length)).toBe(42);
         });
     });
@@ -151,8 +151,8 @@ describe('Optional', () => {
             ).toBe(3);
         });
 
-        it('Computes a default function result if None().', () => {
-            const x: Optional<string> = None();
+        it('Computes a default function result if None.', () => {
+            const x: Optional<string> = None;
             expect(
                 x.mapOrElse(
                     () => 2 * k,
@@ -166,7 +166,7 @@ describe('Optional', () => {
         const x = Some('foo');
         expect(x.okOr(0)).toEqual(Ok('foo'));
 
-        const x2: Optional<string> = None();
+        const x2: Optional<string> = None;
         expect(x2.okOr(0)).toEqual(Err(0));
     });
 
@@ -175,7 +175,7 @@ describe('Optional', () => {
             const x = Some('foo');
             expect(x.okOrElse(() => 0)).toEqual(Ok('foo'));
 
-            const x2: Optional<string> = None();
+            const x2: Optional<string> = None;
             expect(x2.okOrElse(() => 0)).toEqual(Err(0));
         });
     });
@@ -185,24 +185,24 @@ describe('Optional', () => {
             const x = Some(4);
             expect(x.iter().next().value).toEqual(Some(4));
 
-            const x2: Optional<number> = None();
-            expect(x2.iter().next().value).toEqual(None());
+            const x2: Optional<number> = None;
+            expect(x2.iter().next().value).toEqual(None);
         });
     });
 
     describe('and', () => {
         it('Returns `None` if the option is `None`', () => {
             let x = Some(2);
-            let y: Optional<string> = None();
-            expect(x.and(y)).toEqual(None());
+            let y: Optional<string> = None;
+            expect(x.and(y)).toEqual(None);
 
-            x = None();
+            x = None;
             y = Some('foo');
-            expect(x.and(y)).toEqual(None());
+            expect(x.and(y)).toEqual(None);
 
-            x = None();
-            y = None();
-            expect(x.and(y)).toEqual(None());
+            x = None;
+            y = None;
+            expect(x.and(y)).toEqual(None);
         });
 
         it('Returns `optb` if the option is `Some`', () => {
@@ -218,7 +218,7 @@ describe('Optional', () => {
             if (Number.isSafeInteger(result)) {
                 return Some(result);
             }
-            return None();
+            return None;
         }
 
         function sqThenToString(x: number): Optional<string> {
@@ -227,8 +227,8 @@ describe('Optional', () => {
 
         it('Returns `None` if the option is `None`, otherwise calls `f` with the wrapped value and returns the result.', () => {
             expect(Some(2).andThen(sqThenToString)).toEqual(Some('4'));
-            expect(Some(1_000_000_000).andThen(sqThenToString)).toEqual(None());
-            expect(None().andThen(sqThenToString)).toEqual(None());
+            expect(Some(1_000_000_000).andThen(sqThenToString)).toEqual(None);
+            expect(None.andThen(sqThenToString)).toEqual(None);
         });
 
         it('Can be used to chain fallible operations that may return `None`.', () => {
@@ -241,7 +241,7 @@ describe('Optional', () => {
             expect(item0_1).toEqual(Some('A1'));
 
             const item2_0 = Maybe(arr2d[2]).andThen((row) => Maybe(row[0]));
-            expect(item2_0).toEqual(None());
+            expect(item2_0).toEqual(None);
         });
     });
 
@@ -251,8 +251,8 @@ describe('Optional', () => {
         }
 
         it('Returns `None` if the option is `None`, otherwise calls `predicate` with the wrapped value and returns:', () => {
-            expect(None().filter(isEven)).toEqual(None());
-            expect(Some(3).filter(isEven)).toEqual(None());
+            expect(None.filter(isEven)).toEqual(None);
+            expect(Some(3).filter(isEven)).toEqual(None);
             expect(Some(4).filter(isEven)).toEqual(Some(4));
         });
     });
@@ -260,10 +260,10 @@ describe('Optional', () => {
     describe('or', () => {
         it('Returns the option if it contains a value, otherwise returns `optb`.', () => {
             const x = Some(2);
-            const y = None();
+            const y = None;
             expect(x.or(y)).toEqual(Some(2));
 
-            const x2 = None();
+            const x2 = None;
             const y2 = Some(100);
             expect(x2.or(y2)).toEqual(Some(100));
 
@@ -271,15 +271,15 @@ describe('Optional', () => {
             const y3 = Some(100);
             expect(x3.or(y3)).toEqual(Some(2));
 
-            const x4 = None();
-            const y4 = None();
-            expect(x4.or(y4)).toEqual(None());
+            const x4 = None;
+            const y4 = None;
+            expect(x4.or(y4)).toEqual(None);
         });
     });
 
     describe('orElse', () => {
         function nobody(): Optional<string> {
-            return None();
+            return None;
         }
 
         function vikings(): Optional<string> {
@@ -288,38 +288,38 @@ describe('Optional', () => {
 
         it('Returns the option if it contains a value, otherwise calls `f` and returns the result.', () => {
             expect(Some('barbarians').orElse(vikings)).toEqual(Some('barbarians'));
-            expect(None().orElse(vikings)).toEqual(Some('vikings'));
-            expect(None().orElse(nobody)).toEqual(None());
+            expect(None.orElse(vikings)).toEqual(Some('vikings'));
+            expect(None.orElse(nobody)).toEqual(None);
         });
     });
 
     describe('xor', () => {
         it('Returns `Some` if exactly one of `self`, `optb` is `Some`, otherwise returns `None`.', () => {
             const x = Some(2);
-            const y = None();
+            const y = None;
             expect(x.xor(y)).toEqual(Some(2));
 
-            const x2 = None();
+            const x2 = None;
             const y2 = Some(2);
             expect(x2.xor(y2)).toEqual(Some(2));
 
             const x3 = Some(2);
             const y3 = Some(2);
-            expect(x3.xor(y3)).toEqual(None());
+            expect(x3.xor(y3)).toEqual(None);
 
             const x4 = Some(2);
             const y4 = Some(9);
-            expect(x4.xor(y4)).toEqual(None());
+            expect(x4.xor(y4)).toEqual(None);
 
-            const x5 = None();
-            const y5 = None();
-            expect(x5.xor(y5)).toEqual(None());
+            const x5 = None;
+            const y5 = None;
+            expect(x5.xor(y5)).toEqual(None);
         });
     });
 
     describe('insert', () => {
         it('Inserts `value` into the option, then returns a immutable reference to it.', () => {
-            const opt = None();
+            const opt = None;
             const val = opt.insert(1);
             expect(val).toEqual(1);
             expect(opt.unwrap()).toEqual(1);
@@ -330,7 +330,7 @@ describe('Optional', () => {
 
     describe('getOrInsert', () => {
         it('Inserts `value` into the option if it is `None`, then returns an immutable reference to the contained value.', () => {
-            const x = None();
+            const x = None;
             const y = x.getOrInsert(5);
             expect(y).toEqual(5);
             expect(x.unwrap()).toEqual(5);
@@ -341,13 +341,13 @@ describe('Optional', () => {
         it('Takes the value out of the option, leaving a `None` in its place.', () => {
             const x = Some(2);
             const y = x.take();
-            expect(x).toEqual(None());
+            expect(x).toEqual(None);
             expect(y).toEqual(Some(2));
 
-            const x2 = None();
+            const x2 = None;
             const y2 = x2.take();
-            expect(x2).toEqual(None());
-            expect(y2).toEqual(None());
+            expect(x2).toEqual(None);
+            expect(y2).toEqual(None);
         });
     });
 
@@ -358,10 +358,10 @@ describe('Optional', () => {
             expect(x).toEqual(Some(5));
             expect(old).toEqual(Some(2));
 
-            const x2 = None();
+            const x2 = None;
             const old2 = x2.replace(3);
             expect(x2).toEqual(Some(3));
-            expect(old2).toEqual(None());
+            expect(old2).toEqual(None);
         });
     });
 
@@ -373,7 +373,7 @@ describe('Optional', () => {
             x = Some(3);
             expect(x.contains(2)).toBe(false);
 
-            x = None();
+            x = None;
             expect(x.contains(2)).toBe(false);
         });
     });
@@ -388,14 +388,14 @@ describe('Optional', () => {
 
         it('Returns `None` if `self` is `None` or `other` is `None`.', () => {
             const x = Some(1);
-            const y = None();
+            const y = None;
 
-            expect(x.zip(y)).toEqual(None());
+            expect(x.zip(y)).toEqual(None);
 
-            const x2 = None();
+            const x2 = None;
             const y2 = Some('hi');
 
-            expect(x2.zip(y2)).toEqual(None());
+            expect(x2.zip(y2)).toEqual(None);
         });
     });
 
@@ -409,24 +409,24 @@ describe('Optional', () => {
 
         it('Returns `None` if `self` is `None` or `other` is `None`.', () => {
             const x = Some(17.5);
-            const y = None();
+            const y = None;
 
-            expect(x.zipWith(y, (a, b) => ({ x: a, y: b }))).toEqual(None());
+            expect(x.zipWith(y, (a, b) => ({ x: a, y: b }))).toEqual(None);
 
-            const x2 = None();
+            const x2 = None;
             const y2 = Some(42.7);
 
-            expect(x2.zipWith(y2, (a, b) => ({ x: a, y: b }))).toEqual(None());
+            expect(x2.zipWith(y2, (a, b) => ({ x: a, y: b }))).toEqual(None);
         });
     });
 
     describe('unzip', () => {
         it('Unzips an option containing a tuple of two options.', () => {
             const x = Some([1, 'hi']);
-            const y = None();
+            const y = None;
 
             expect(x.unzip()).toEqual([Some(1), Some('hi')]);
-            expect(y.unzip()).toEqual([None(), None()]);
+            expect(y.unzip()).toEqual([None, None]);
         });
     });
 
@@ -436,8 +436,8 @@ describe('Optional', () => {
             const y = Some(Ok(5));
             expect(x).toEqual(y.transpose());
 
-            const x2 = Ok(None());
-            const y2 = None();
+            const x2 = Ok(None);
+            const y2 = None;
             expect(x2).toEqual(y2.transpose());
 
             const x3 = Err('Some error');
@@ -492,5 +492,33 @@ describe('Optional', () => {
             expect(Some(1).ne(Some(1))).toBe(false);
             expect(Some(2).ne(Some(1))).toBe(true);
         });
+    });
+});
+
+describe('Some', () => {
+    it('Creates a new Optional containing the given value.', () => {
+        const x = Some(2);
+        expect(x).toEqual(new Optional(2));
+    });
+
+    it('Throws an error if called with no arguments.', () => {
+        // @ts-expect-error
+        expect(() => Some()).toThrow();
+    });
+
+    it('Throws an error if called with null, undefined, or None.', () => {
+        // @ts-expect-error
+        expect(() => Some(null)).toThrow();
+        // @ts-expect-error
+        expect(() => Some(undefined)).toThrow();
+        // @ts-expect-error
+        expect(() => Some(None)).toThrow();
+    });
+});
+
+describe('None', () => {
+    it('Creates a new Optional containing no value.', () => {
+        const x = None;
+        expect(x).toEqual(new Optional(null));
     });
 });

@@ -27,7 +27,7 @@ import { Err, Ok, Result } from './result';
  * ```
  * function divide(numerator: number, denominator: number): Optional<number> {
  *     if (denominator === 0) {
- *         return None()
+ *         return None
  *     } else {
  *         return Some(numerator / denominator)
  *     }
@@ -50,7 +50,7 @@ class Optional<T> {
      * Returns `true` if the option is a {@link Some `Some`} value.
      */
     isSome(): boolean {
-        if (this.value === undefined || this.value === null) {
+        if (this.value === null || typeof this.value === 'undefined') {
             return false;
         }
 
@@ -92,7 +92,7 @@ class Optional<T> {
             return this.value;
         }
 
-        throw new Error('Called `Option.unwrap()` on a `None()` value');
+        throw new Error('Called `Option.unwrap()` on a `None` value');
     }
 
     /**
@@ -124,14 +124,14 @@ class Optional<T> {
         if (this.isSome()) {
             const value = f(this.value);
 
-            if (value === undefined || value === null) {
-                return None();
+            if (value === null || typeof value === 'undefined') {
+                return _None();
             }
 
-            return Some(value);
+            return Some(value as any);
         }
 
-        return None();
+        return _None();
     }
 
     /**
@@ -212,7 +212,7 @@ class Optional<T> {
             return optb;
         }
 
-        return None();
+        return _None();
     }
 
     /**
@@ -226,7 +226,7 @@ class Optional<T> {
             return f(this.value);
         }
 
-        return None();
+        return _None();
     }
 
     /**
@@ -248,7 +248,7 @@ class Optional<T> {
             }
         }
 
-        return None();
+        return _None();
     }
 
     /**
@@ -283,7 +283,7 @@ class Optional<T> {
      */
     xor(optb: Optional<T>): Optional<T> {
         if (this.isSome() && optb.isSome()) {
-            return None();
+            return _None();
         }
 
         if (this.isSome()) {
@@ -294,7 +294,7 @@ class Optional<T> {
             return optb;
         }
 
-        return None();
+        return _None();
     }
 
     /**
@@ -335,7 +335,7 @@ class Optional<T> {
             return Some(value as any);
         }
 
-        return None();
+        return _None();
     }
 
     /**
@@ -346,10 +346,10 @@ class Optional<T> {
     replace(newValue: T): Optional<T> {
         const oldValue = this.value;
         this.value = newValue;
-        if (oldValue === null || oldValue === undefined) {
-            return None();
+        if (oldValue === null || typeof oldValue === 'undefined') {
+            return _None();
         }
-        return Some(oldValue);
+        return Some(oldValue as any);
     }
 
     /**
@@ -374,7 +374,7 @@ class Optional<T> {
             return Some([this.value, other.value]);
         }
 
-        return None();
+        return _None();
     }
 
     /**
@@ -388,14 +388,14 @@ class Optional<T> {
             return Maybe(f(this.value, other.value));
         }
 
-        return None();
+        return _None();
     }
 
     /**
      * Unzips an option containing a tuple of two options.
      *
      * If `self` is `Some([a, b])` this method returns `[Some(a), Some(b)]`.
-     * Otherwise, `[None(), None()]` is returned.
+     * Otherwise, `[None, None]` is returned.
      */
     unzip<U>(): [Optional<T>, Optional<U>] {
         if (this.isSome()) {
@@ -404,7 +404,7 @@ class Optional<T> {
             }
         }
 
-        return [None(), None()];
+        return [_None(), _None()];
     }
 
     /**
@@ -433,7 +433,7 @@ class Optional<T> {
             throw new Error('Value is not a Result');
         }
 
-        return Ok(None());
+        return Ok(_None());
     }
 
     /* Equality */
@@ -480,23 +480,43 @@ class Optional<T> {
     }
 }
 
-type SomeValue<T> = T extends null | undefined ? never : T;
-
 /**
- * Some value of type `T`.
+ * Creates a new {@link Optional `Optional`} with no value.
  */
-function Some<T>(value: SomeValue<T>): Optional<T> {
-    if (value === null || typeof value === 'undefined') {
-        throw new Error('Tried to create Some() with a null or undefined value.');
+function _None(): Optional<any> {
+    if (arguments.length > 0) {
+        throw new Error('None() does not take any arguments.');
     }
-    return new Optional(value);
+    return new Optional(null);
 }
 
 /**
  * No value.
  */
-function None(): Optional<any> {
-    return new Optional(null);
+declare const None: Optional<any>;
+Object.defineProperty(exports, 'None', { get: _None });
+
+type SomeValue<T> = T extends null | undefined | Optional<null> ? never : T;
+
+/**
+ * Some value of type `T`.
+ */
+function Some<T>(value: SomeValue<T>): Optional<T> {
+    if (value === null || typeof value === 'undefined' || value instanceof Optional) {
+        throw new Error('Tried to create Some() with a null or undefined value.');
+    }
+    const isNoneOption =
+        typeof value === 'object' &&
+        value !== null &&
+        'isNone' in value &&
+        typeof value.isNone === 'function' &&
+        value.isNone();
+
+    if (isNoneOption) {
+        throw new Error('Tried to create Some() with a None value.');
+    }
+
+    return new Optional(value);
 }
 
 /**
@@ -505,11 +525,11 @@ function None(): Optional<any> {
  */
 function Maybe<T>(value: T): Optional<T> {
     if (value === null || typeof value === 'undefined') {
-        return None();
+        return _None();
     }
-    return Some(value);
+    return Some(value as any);
 }
 
 type Unwrapped<T> = T extends Result<infer U, any> ? U : never;
 
-export { Optional, Some, None, Maybe };
+export { Optional, Some, Maybe, None };

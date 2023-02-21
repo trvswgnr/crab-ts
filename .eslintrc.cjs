@@ -16,6 +16,7 @@ module.exports = {
         'plugin:import/typescript',
     ],
     rules: {
+        '@typescript-eslint/no-inferrable-types': 'off',
         '@typescript-eslint/ban-ts-comment': 'off',
         // allow explicit any
         '@typescript-eslint/no-explicit-any': 'off',

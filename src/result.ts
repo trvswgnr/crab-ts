@@ -8,7 +8,11 @@ class Result<T, E> {
      * Returns `true` if the result is {@link Ok `Ok`}.
      */
     isOk(): boolean {
-        if (this.value instanceof Error || this.value === undefined || this.value === null) {
+        if (
+            this.value instanceof Error ||
+            typeof this.value === 'undefined' ||
+            this.value === null
+        ) {
             return false;
         }
 
@@ -48,14 +52,14 @@ class Result<T, E> {
      */
     ok(): Optional<T> {
         if (this.isOk()) {
-            if (this.value === undefined || this.value === null) {
-                return None();
+            if (typeof this.value === 'undefined' || this.value === null) {
+                return None;
             }
 
-            return Some(this.value);
+            return Some(this.value as any);
         }
 
-        return None();
+        return None;
     }
 
     /**
@@ -69,7 +73,7 @@ class Result<T, E> {
             return new Optional(this.error);
         }
 
-        return None();
+        return None;
     }
 
     /**
@@ -325,20 +329,20 @@ class Result<T, E> {
 
     /**
      * Transposes a `Result` of an `Option` into an `Option` of a `Result`.
-     * `Ok(None())` will be mapped to `None()`.
+     * `Ok(None)` will be mapped to `None`.
      * `Ok(Some(_))` and `Err(_)` will be mapped to `Some(Ok(_))` and `Some(Err(_))`.
      */
     transpose(): Optional<Result<T, E>> {
         if (this.isOk()) {
             if (this.value === null) {
-                return None();
+                return None;
             }
 
             return Some(Ok(this.value));
         }
 
         if (this.error === null) {
-            return None();
+            return None;
         }
 
         return Some(Err(this.error));
