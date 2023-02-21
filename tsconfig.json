@@ -12,8 +12,14 @@
   "include": [
     "src/**/*"
   ],
+  "files": [
+    "src/index.ts",
+    "src/optional.ts",
+    "src/result.ts",
+  ],
   "exclude": [
     "dist",
-    "node_modules"
+    "node_modules",
+    "src/**/*.test.ts",
   ]
 }

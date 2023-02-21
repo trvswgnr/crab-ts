@@ -10,12 +10,19 @@
         "strict": true, /* Enable all strict type-checking options. */
         "declaration": true, /* Generates corresponding '.d.ts' file. */
         "outDir": "dist", /* Redirect output structure to the directory. */
+        "moduleResolution": "node",
     },
     "include": [
         "src/**/*"
     ],
+    "files": [
+        "src/index.ts",
+        "src/optional.ts",
+        "src/result.ts",
+    ],
     "exclude": [
         "dist",
-        "node_modules"
+        "node_modules",
+        "src/**/*.test.ts",
     ]
 }
