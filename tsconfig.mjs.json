@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
+        "target": "ES2020",
+        /* We want to create .mjs files, not .js files. */
+        "module": "es2020",
+        // "noEmit": true, /* Disable emitting files from a compilation. */
+        "esModuleInterop": true, /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
+        "forceConsistentCasingInFileNames": true, /* Ensure that casing is correct in imports. */
+        "strict": true, /* Enable all strict type-checking options. */
+        "declaration": true, /* Generates corresponding '.d.ts' file. */
+        "outDir": "dist", /* Redirect output structure to the directory. */
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "dist",
+        "node_modules"
+    ]
+}

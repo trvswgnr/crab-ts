@@ -17,7 +17,7 @@ const pkgJsonExports = Object.keys(packageJson.exports).filter((entrypoint) => {
 const entrypointFiles = fs
   .readdirSync(path.join(__dirname, "../src/entrypoints"))
   .map((file) => {
-    return file.replace(".d.ts", "");
+    return file.replace(".ts", "");
   });
 
 for (const entrypointFile of entrypointFiles) {
