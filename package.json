@@ -29,7 +29,7 @@
       "import": "./dist/index.mjs",
       "default": "./dist/index.js"
     },
-    "./utils": {
+    "./util": {
       "types": "./dist/util.d.ts",
       "import": "./dist/util.mjs",
       "default": "./dist/util.js"
