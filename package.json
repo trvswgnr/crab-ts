@@ -1,6 +1,6 @@
 {
   "name": "typescript-result-option",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Implementation of Rust's Result and Option in TypeScript.",
   "private": false,
   "repository": "https://github.com/trvswgnr/typescript-result-option",
@@ -45,7 +45,15 @@
       "default": "./dist/result.js"
     }
   },
-  "keywords": ["result", "option", "rust", "typescript", "ts", "js", "javascript"],
+  "keywords": [
+    "result",
+    "option",
+    "rust",
+    "typescript",
+    "ts",
+    "js",
+    "javascript"
+  ],
   "author": "Travis Aaron Wagner",
   "license": "MIT",
   "devDependencies": {
