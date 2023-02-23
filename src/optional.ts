@@ -483,26 +483,24 @@ class Optional<T> {
 /**
  * Creates a new {@link Optional `Optional`} with no value.
  */
-function _None(): Optional<any> {
-    if (arguments.length > 0) {
-        throw new Error('None() does not take any arguments.');
-    }
-    return new Optional(null);
+function _None() {
+    return new Optional(null) as None;
 }
 
 /**
  * No value.
  */
-declare const None: Optional<any>;
+declare const None: None;
 Object.defineProperty(exports, 'None', { get: _None });
 
 /**
  * Some value of type `T`.
  */
-function Some<T>(value: SomeValue<T>): Optional<T> {
-    if (value === null || typeof value === 'undefined' || value instanceof Optional) {
+function Some<T extends {}>(value: SomeValue<T>): Some<T> {
+    if (value === null || typeof value === 'undefined') {
         throw new Error('Tried to create Some() with a null or undefined value.');
     }
+
     const isNoneOption =
         typeof value === 'object' &&
         value !== null &&
@@ -518,6 +516,9 @@ function Some<T>(value: SomeValue<T>): Optional<T> {
 }
 
 type SomeValue<T> = T extends null | undefined | Optional<null> ? never : T;
+
+declare type None = Optional<any>;
+declare type Some<T> = Optional<SomeValue<T>>;
 
 /**
  * Returns {@link Some `Some(value)`} if `value` is not null or undefined,

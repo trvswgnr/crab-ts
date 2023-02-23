@@ -14,6 +14,7 @@
     "publish": "changeset publish",
     "test": "jest"
   },
+  "type": "commonjs",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
