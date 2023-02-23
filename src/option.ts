@@ -3,11 +3,11 @@ import { Err, Ok, Result } from './result';
 /**
  * Implementation of Rust's `Option` type in TypeScript.
  *
- * ### Optional values.
+ * ### Option values.
  *
- * Type {@link Optional `Optional`} represents an optional value: every {@link Optional `Optional`}
+ * Type {@link Option `Option`} represents an option value: every {@link Option `Option`}
  * is either {@link Some `Some`} and contains a value, or {@link None `None`}, and
- * does not. {@link Optional `Optional`} types are very common in Rust code, as
+ * does not. {@link Option `Option`} types are very common in Rust code, as
  * they have a number of uses:
  *
  * * Initial values
@@ -15,17 +15,17 @@ import { Err, Ok, Result } from './result';
  *   over their entire input range (partial functions)
  * * Return value for otherwise reporting simple errors, where {@link None `None`} is
  *   returned on error
- * * Optional class fields
+ * * Option class fields
  * * Class fields that can be loaned or "taken"
- * * Optional function arguments
+ * * Option function arguments
  * * Nullable values
  * * Swapping things out of difficult situations
  *
- * In Rust, {@link Optional `Optional`}s are commonly paired with pattern matching to query the presence
+ * In Rust, {@link Option `Option`}s are commonly paired with pattern matching to query the presence
  * of a value and take action, always accounting for the {@link None `None`} case. Unfortunately,
  * TypeScript does not have pattern matching, so we have to use a series of `if` statements.
  * ```
- * function divide(numerator: number, denominator: number): Optional<number> {
+ * function divide(numerator: number, denominator: number): Option<number> {
  *     if (denominator === 0) {
  *         return None
  *     } else {
@@ -33,7 +33,7 @@ import { Err, Ok, Result } from './result';
  *     }
  * }
  *
- * // The return value of the function is an Optional<number>
+ * // The return value of the function is an Option<number>
  * let result = divide(2, 3);
  *
  * if (result.isSome()) {
@@ -43,7 +43,7 @@ import { Err, Ok, Result } from './result';
  * }
  * ```
  */
-class Optional<T> {
+class Option<T> {
     constructor(private value: T) {}
 
     /**
@@ -118,9 +118,9 @@ class Optional<T> {
     }
 
     /**
-     * Maps an {@link Optional<T> `Optional<T>`} to {@link Optional<U> `Optional<U>`} by applying a function to a contained value.
+     * Maps an {@link Option<T> `Option<T>`} to {@link Option<U> `Option<U>`} by applying a function to a contained value.
      */
-    map<U, F extends (x: T) => U>(f: F): Optional<U> {
+    map<U, F extends (x: T) => U>(f: F): Option<U> {
         if (this.isSome()) {
             const value = f(this.value);
 
@@ -137,7 +137,7 @@ class Optional<T> {
     /**
      * Calls the provided closure with a reference to the contained value (if {@link Some `Some`}).
      */
-    inspect<F extends (x: T) => void>(f: F): Optional<T> {
+    inspect<F extends (x: T) => void>(f: F): Option<T> {
         if (this.isSome()) {
             f(this.value);
         }
@@ -170,7 +170,7 @@ class Optional<T> {
     }
 
     /**
-     * Transforms the {@link Optional<T> `Optional<T>`} into a {@link Result<T, E> `Result<T, E>`}, mapping {@link Some `Some(v)`} to
+     * Transforms the {@link Option<T> `Option<T>`} into a {@link Result<T, E> `Result<T, E>`}, mapping {@link Some `Some(v)`} to
      * {@link Ok `Ok(v)`} and {@link None `None`} to {@link Err `Err(err)`}.
      */
     okOr<E>(err: E): Result<T, E> {
@@ -182,7 +182,7 @@ class Optional<T> {
     }
 
     /**
-     * Transforms the {@link Optional<T> `Optional<T>`} into a {@link Result<T, E> `Result<T, E>`}, mapping {@link Some `Some(v)`} to
+     * Transforms the {@link Option<T> `Option<T>`} into a {@link Result<T, E> `Result<T, E>`}, mapping {@link Some `Some(v)`} to
      * {@link Ok `Ok(v)`} and {@link None `None`} to {@link Err `Err(err())`}.
      */
     okOrElse<E, F extends () => E>(err: F): Result<T, E> {
@@ -196,18 +196,18 @@ class Optional<T> {
     /**
      * Returns an iterator over the possibly contained value.
      */
-    iter(): IterableIterator<Optional<T>> {
+    iter(): IterableIterator<Option<T>> {
         return [this].values();
     }
 
     /**
      * Returns {@link None `None`} if the option is {@link None `None`}, otherwise returns `optb`.
      *
-     * Arguments passed to {@link Optional.and `and`} are eagerly evaluated; if you are passing the
-     * result of a function call, it is recommended to use {@link Optional.andThen `andThen`}, which is
+     * Arguments passed to {@link Option.and `and`} are eagerly evaluated; if you are passing the
+     * result of a function call, it is recommended to use {@link Option.andThen `andThen`}, which is
      * lazily evaluated.
      */
-    and<U>(optb: Optional<U>): Optional<U> {
+    and<U>(optb: Option<U>): Option<U> {
         if (this.isSome()) {
             return optb;
         }
@@ -221,7 +221,7 @@ class Optional<T> {
      *
      * Some languages call this operation flatmap.
      */
-    andThen<U, F extends (x: T) => Optional<U>>(f: F): Optional<U> {
+    andThen<U, F extends (x: T) => Option<U>>(f: F): Option<U> {
         if (this.isSome()) {
             return f(this.value);
         }
@@ -238,10 +238,10 @@ class Optional<T> {
      * - {@link None `None`} if `predicate` returns `false`.
      *
      * This function works similar to {@link Array.filter `Array.filter()`}. You can imagine
-     * the {@link Optional `Optional<T>`} being an iterator over one or zero elements. {@link Optional.filter `filter()`}
+     * the {@link Option `Option<T>`} being an iterator over one or zero elements. {@link Option.filter `filter()`}
      * lets you decide which elements to keep.
      */
-    filter<F extends (x: T) => boolean>(predicate: F): Optional<T> {
+    filter<F extends (x: T) => boolean>(predicate: F): Option<T> {
         if (this.isSome()) {
             if (predicate(this.value)) {
                 return this;
@@ -254,11 +254,11 @@ class Optional<T> {
     /**
      * Returns the option if it contains a value, otherwise returns `optb`.
      *
-     * Arguments passed to {@link Optional.or `or`} are eagerly evaluated; if you are passing the
-     * result of a function call, it is recommended to use {@link Optional.orElse `orElse`}, which is
+     * Arguments passed to {@link Option.or `or`} are eagerly evaluated; if you are passing the
+     * result of a function call, it is recommended to use {@link Option.orElse `orElse`}, which is
      * lazily evaluated.
      */
-    or(optb: Optional<T>): Optional<T> {
+    or(optb: Option<T>): Option<T> {
         if (this.isSome()) {
             return this;
         }
@@ -270,7 +270,7 @@ class Optional<T> {
      * Returns the option if it contains a value, otherwise calls `f` and
      * returns the result.
      */
-    orElse<F extends () => Optional<T>>(f: F): Optional<T> {
+    orElse<F extends () => Option<T>>(f: F): Option<T> {
         if (this.isSome()) {
             return this;
         }
@@ -281,7 +281,7 @@ class Optional<T> {
     /**
      * Returns {@link Some `Some`} if exactly one of `self`, `optb` is {@link Some `Some`}, otherwise returns {@link None `None`}.
      */
-    xor(optb: Optional<T>): Optional<T> {
+    xor(optb: Option<T>): Option<T> {
         if (this.isSome() && optb.isSome()) {
             return _None();
         }
@@ -302,7 +302,7 @@ class Optional<T> {
      *
      * If the option already contains a value, the old value is dropped.
      *
-     * See also {@link Optional.getOrInsert `Optional.getOrInsert`}, which doesn't
+     * See also {@link Option.getOrInsert `Option.getOrInsert`}, which doesn't
      * update the value if the option already contains {@link Some `Some`}.
      */
     insert(value: T): T {
@@ -314,7 +314,7 @@ class Optional<T> {
      * Inserts `value` into the option if it is {@link None `None`}, then
      * returns a reference to the contained value.
      *
-     * See also {@link Optional.insert `insert`}, which updates the value even if
+     * See also {@link Option.insert `insert`}, which updates the value even if
      * the option already contains {@link Some `Some`}.
      */
     getOrInsert(value: T): T {
@@ -328,7 +328,7 @@ class Optional<T> {
     /**
      * Takes the value out of the option, leaving a {@link None `None`} in its place.
      */
-    take(): Optional<T> {
+    take(): Option<T> {
         if (this.isSome()) {
             const value = this.value;
             this.value = null as T;
@@ -343,7 +343,7 @@ class Optional<T> {
      * returning the old value if present,
      * leaving a {@link Some `Some`} in its place without deinitializing either one.
      */
-    replace(newValue: T): Optional<T> {
+    replace(newValue: T): Option<T> {
         const oldValue = this.value;
         this.value = newValue;
         if (oldValue === null || typeof oldValue === 'undefined') {
@@ -369,7 +369,7 @@ class Optional<T> {
      * If `this` is {@link Some `Some(s)`} and `other` is {@link Some `Some(o)`}, this method returns {@link Some `Some([s, o])`}.
      * Otherwise, `None` is returned.
      */
-    zip<U>(other: Optional<U>): Optional<[T, U]> {
+    zip<U>(other: Option<U>): Option<[T, U]> {
         if (this.isSome() && other.isSome()) {
             return Some([this.value, other.value]);
         }
@@ -383,7 +383,7 @@ class Optional<T> {
      * If `self` is {@link Some `Some(s)`} and `other` is {@link Some `Some(o)`}, this method returns {@link Maybe `Maybe(f(s, o))}`.
      * Otherwise, `None` is returned.
      */
-    zipWith<U, F extends (x: T, y: U) => R, R>(other: Optional<U>, f: F): Optional<R> {
+    zipWith<U, F extends (x: T, y: U) => R, R>(other: Option<U>, f: F): Option<R> {
         if (this.isSome() && other.isSome()) {
             return Maybe(f(this.value, other.value));
         }
@@ -397,7 +397,7 @@ class Optional<T> {
      * If `self` is `Some([a, b])` this method returns `[Some(a), Some(b)]`.
      * Otherwise, `[None, None]` is returned.
      */
-    unzip<U>(): [Optional<T>, Optional<U>] {
+    unzip<U>(): [Option<T>, Option<U>] {
         if (this.isSome()) {
             if (Array.isArray(this.value) && this.value.length === 2) {
                 return [Some(this.value[0]), Some(this.value[1])];
@@ -408,13 +408,13 @@ class Optional<T> {
     }
 
     /**
-     * Transposes an {@link Optional `Optional`} of a {@link Result  `Result`} into a {@link Result  `Result`} of an {@link Optional `Optional`}.
+     * Transposes an {@link Option `Option`} of a {@link Result  `Result`} into a {@link Result  `Result`} of an {@link Option `Option`}.
      *
      * - {@link None `None`} will be mapped to {@link Ok `Ok`}
      * - {@link Some `Some(Ok(_))`} will be mapped to {@link Ok `Ok(Some(_))`}
      * - {@link Some `Some(Err(_))`} will be mapped to {@link Err `Err(_)`}
      */
-    transpose(): Result<Optional<T extends Result<any, any> ? Unwrapped<T> : never>, any> {
+    transpose(): Result<Option<T extends Result<any, any> ? Unwrapped<T> : never>, any> {
         if (this.isSome()) {
             if (
                 typeof this.value === 'object' &&
@@ -438,29 +438,29 @@ class Optional<T> {
 
     /* Equality */
 
-    eq(other: Optional<T>): boolean {
+    eq(other: Option<T>): boolean {
         return this.value === other.value;
     }
 
-    ne(other: Optional<T>): boolean {
+    ne(other: Option<T>): boolean {
         return !this.eq(other);
     }
 
     /* Ordering */
 
-    lt(other: Optional<T>): boolean {
+    lt(other: Option<T>): boolean {
         return this.value < other.value;
     }
 
-    le(other: Optional<T>): boolean {
+    le(other: Option<T>): boolean {
         return this.value <= other.value;
     }
 
-    gt(other: Optional<T>): boolean {
+    gt(other: Option<T>): boolean {
         return this.value > other.value;
     }
 
-    ge(other: Optional<T>): boolean {
+    ge(other: Option<T>): boolean {
         return this.value >= other.value;
     }
 
@@ -481,10 +481,10 @@ class Optional<T> {
 }
 
 /**
- * Creates a new {@link Optional `Optional`} with no value.
+ * Creates a new {@link Option `Option`} with no value.
  */
 function _None() {
-    return new Optional(null) as None;
+    return new Option(null) as None;
 }
 
 /**
@@ -512,19 +512,19 @@ function Some<T extends {}>(value: SomeValue<T>): Some<T> {
         throw new Error('Tried to create Some() with a None value.');
     }
 
-    return new Optional(value);
+    return new Option(value);
 }
 
-export type SomeValue<T> = T extends null | undefined | Optional<null> ? never : T;
+export type SomeValue<T> = T extends null | undefined | Option<null> ? never : T;
 
-type None = Optional<any>;
-declare type Some<T> = Optional<SomeValue<T>>;
+type None = Option<any>;
+declare type Some<T> = Option<SomeValue<T>>;
 
 /**
  * Returns {@link Some `Some(value)`} if `value` is not null or undefined,
  * otherwise returns {@link None `None`}.
  */
-function Maybe<T>(value: T): Optional<T> {
+function Maybe<T>(value: T): Option<T> {
     if (value === null || typeof value === 'undefined') {
         return _None();
     }
@@ -533,4 +533,4 @@ function Maybe<T>(value: T): Optional<T> {
 
 type Unwrapped<T> = T extends Result<infer U, any> ? U : never;
 
-export { Optional, Some, Maybe, None };
+export { Option, Some, Maybe, None };

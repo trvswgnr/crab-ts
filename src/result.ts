@@ -1,4 +1,4 @@
-import { None, Optional, Some } from './optional';
+import { None, Option, Some } from './option';
 import { UnimplementedError, assertIs } from './util';
 
 class Result<T, E> {
@@ -50,7 +50,7 @@ class Result<T, E> {
      * Converts `this` into an [`Option<T>`], consuming `this`,
      * and discarding the error, if any.
      */
-    ok(): Optional<T> {
+    ok(): Option<T> {
         if (this.isOk()) {
             if (typeof this.value === 'undefined' || this.value === null) {
                 return None;
@@ -68,9 +68,9 @@ class Result<T, E> {
      * Converts `this` into an [`Option<E>`], consuming `this`,
      * and discarding the success value, if any.
      */
-    err(): Optional<E> {
+    err(): Option<E> {
         if (this.isErr()) {
-            return new Optional(this.error);
+            return new Option(this.error);
         }
 
         return None;
@@ -160,13 +160,13 @@ class Result<T, E> {
      *
      * The iterator yields one value if the result is {@link Ok `Ok`}, otherwise none.
      */
-    iter(): IterableIterator<Optional<T>> {
+    iter(): IterableIterator<Option<T>> {
         if (this.isOk()) {
             if (typeof this.value === 'undefined' || this.value === null) {
                 return [None].values();
             }
 
-            return [Some(this.value as {}) as Optional<T>].values();
+            return [Some(this.value as {}) as Option<T>].values();
         }
 
         return [None].values();
@@ -382,7 +382,7 @@ class Result<T, E> {
      * `Ok(None)` will be mapped to `None`.
      * `Ok(Some(_))` and `Err(_)` will be mapped to `Some(Ok(_))` and `Some(Err(_))`.
      */
-    transpose(): Optional<Result<T, E>> {
+    transpose(): Option<Result<T, E>> {
         if (this.isOk()) {
             if (this.value === null) {
                 return None;
@@ -438,15 +438,15 @@ function Err<T, E>(value: E): Result<T, E> {
 /**
  * Try to execute a function and return a Result
  */
-function Try<T extends () => Result<T, E | Error>, E>(op: T): Result<T, E | Error> {
+function Try<T extends CallableFunction, E>(op: T): Result<T, E> {
     try {
-        return op();
-    } catch (e) {
-        if (e instanceof Error) {
-            return Err(e);
+        const res = op();
+        if (typeof res === 'object' && res !== null && 'isErr' in res && 'isOk' in res) {
+            return res;
         }
-
-        return Err(new Error('Unknown error'));
+        return Ok(res);
+    } catch (e) {
+        return Err(e) as Result<T, E>;
     }
 }
 

@@ -1,4 +1,4 @@
-import { None, Optional, Some } from '../src/optional';
+import { None, Option, Some } from '../src/option';
 import { Err, Ok, Result, Try } from '../src/result';
 import { ErrorKind } from '../src/util';
 
@@ -386,33 +386,76 @@ describe('Result', () => {
 
     describe('transpose', () => {
         it('Transposes a `Result` of an `Option` into an `Option` of a `Result`.', () => {
-            const x: Result<Optional<number>, Error> = Ok(Some(5));
-            const y: Optional<Result<number, Error>> = Some(Ok(5));
+            const x: Result<Option<number>, Error> = Ok(Some(5));
+            const y: Option<Result<number, Error>> = Some(Ok(5));
             expect(x.transpose()).toEqual(y);
         });
 
         it('`Ok(None)` will be mapped to `None`.', () => {
-            const x: Result<Optional<number>, Error> = Ok(None);
-            const y: Optional<Result<number, Error>> = None;
+            const x: Result<Option<number>, Error> = Ok(None);
+            const y: Option<Result<number, Error>> = None;
             expect(x.transpose()).toEqual(y);
         });
 
         it('`Ok(Some(_))` and `Err(_)` will be mapped to `Some(Ok(_))` and `Some(Err(_))`.', () => {
-            const x: Result<Optional<number>, Error> = Err(new Error('Some error message'));
-            const y: Optional<Result<number, Error>> = Some(Err(new Error('Some error message')));
+            const x: Result<Option<number>, Error> = Err(new Error('Some error message'));
+            const y: Option<Result<number, Error>> = Some(Err(new Error('Some error message')));
             expect(x.transpose()).toEqual(y);
 
-            const x2: Result<Optional<number>, Optional<number>> = Err(Some(5));
-            const y2: Optional<Result<number, number>> = Some(Err(5));
+            const x2: Result<Option<number>, Option<number>> = Err(Some(5));
+            const y2: Option<Result<number, number>> = Some(Err(5));
             expect(x2.transpose()).toEqual(y2);
 
-            const x3: Result<Optional<number>, Optional<number>> = Err(None);
-            const y3: Optional<Result<number, number>> = None;
+            const x3: Result<Option<number>, Option<number>> = Err(None);
+            const y3: Option<Result<number, number>> = None;
             expect(x3.transpose()).toEqual(y3);
 
-            const x4: Result<Optional<number>, number> = Err(5);
-            const y4: Optional<Result<number, number>> = Some(Err(5));
+            const x4: Result<Option<number>, number> = Err(5);
+            const y4: Option<Result<number, number>> = Some(Err(5));
             expect(x4.transpose()).toEqual(y4);
         });
+    });
+});
+
+describe('Try', () => {
+    it('Returns a `Result` containing the evaluation of the given function.', () => {
+        expect(Try(() => 2 + 2)).toEqual(Ok(4));
+
+        const x = 1_000_000_000;
+
+        expect(Try(() => x.checkedMul(x))).toEqual(Err('overflowed'));
+
+        expect(
+            Try(() => {
+                throw new Error('Some error message');
+            }),
+        ).toEqual(Err(new Error('Some error message')));
+
+        expect(
+            Try(() => {
+                throw 'Some error message';
+            }),
+        ).toEqual(Err('Some error message'));
+
+        const x2 = 5;
+        expect(
+            Try(() => {
+                if (x2 === 5) {
+                    return Ok(5);
+                } else {
+                    return Err('Some error message');
+                }
+            }),
+        ).toEqual(Ok(5));
+
+        expect(
+            Try(() => {
+                if (x2 < 5) {
+                    return Ok(5);
+                } else {
+                    return Err('Some error message');
+                }
+            }),
+        ).toEqual(Err('Some error message'));
     });
 });

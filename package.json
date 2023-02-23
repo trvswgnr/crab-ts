@@ -35,10 +35,10 @@
       "import": "./dist/util.mjs",
       "default": "./dist/util.js"
     },
-    "./optional": {
-      "types": "./dist/optional.d.ts",
-      "import": "./dist/optional.mjs",
-      "default": "./dist/optional.js"
+    "./option": {
+      "types": "./dist/option.d.ts",
+      "import": "./dist/option.mjs",
+      "default": "./dist/option.js"
     },
     "./result": {
       "types": "./dist/result.d.ts",
