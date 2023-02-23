@@ -1,6 +1,6 @@
-import { ErrorKind } from '../src/errors';
 import { None, Optional, Some } from '../src/optional';
 import { Err, Ok, Result, Try } from '../src/result';
+import { ErrorKind } from '../src/util';
 
 const fromJson = (s: string): Result<any, string> => {
     try {
