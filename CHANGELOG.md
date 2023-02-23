@@ -1,5 +1,11 @@
 # typescript-result-option
 
+## 0.2.3
+
+### Patch Changes
+
+-   f6bafa8: lots of small changes, added exhaustive unit tests
+
 ## 0.2.2
 
 ### Patch Changes
