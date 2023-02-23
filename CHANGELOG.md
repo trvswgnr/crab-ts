@@ -1,5 +1,11 @@
 # typescript-result-option
 
+## 0.2.2
+
+### Patch Changes
+
+-   82dd924: make None callable without parens
+
 ## 0.2.1
 
 ### Patch Changes
