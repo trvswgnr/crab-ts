@@ -1,6 +1,5 @@
-import { UnimplementedError } from './errors';
 import { None, Optional, Some } from './optional';
-import { assertIs } from './util';
+import { UnimplementedError, assertIs } from './util';
 
 class Result<T, E> {
     constructor(private value: T, private error: E) {}
