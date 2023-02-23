@@ -1,3 +1,4 @@
+import { UnimplementedError } from './errors';
 import { None, Optional, Some } from './optional';
 import { assertIs } from './util';
 
@@ -148,7 +149,7 @@ class Result<T, E> {
     /**
      * Calls the provided closure with a reference to the contained error (if {@link Err `Err`}).
      */
-    inspectErr<F>(f: F extends VoidFunction ? F : (value: E) => void): Result<T, E> {
+    inspectErr<F>(f: (value: E) => void): Result<T, E> {
         if (this.isErr()) {
             f(this.error);
         }
@@ -158,17 +159,18 @@ class Result<T, E> {
     /**
      * Returns an iterator over the possibly contained value.
      *
-     * The iterator yields one value if the result is [`Result::Ok`], otherwise none.
+     * The iterator yields one value if the result is {@link Ok `Ok`}, otherwise none.
      */
-    iter(): Iterable<T> {
+    iter(): IterableIterator<Optional<T>> {
         if (this.isOk()) {
-            if (this.value instanceof Object && Symbol.iterator in this.value) {
-                return [...(this.value as Iterable<T>)];
+            if (typeof this.value === 'undefined' || this.value === null) {
+                return [None].values();
             }
 
-            return [this.value];
+            return [Some(this.value as {}) as Optional<T>].values();
         }
-        return [];
+
+        return [None].values();
     }
 
     /**
@@ -178,7 +180,8 @@ class Result<T, E> {
         if (this.isOk()) {
             return this.value;
         }
-        throw new Error(msg);
+
+        throw new Error(`${msg}: ${this.error}`);
     }
 
     /**
@@ -188,8 +191,23 @@ class Result<T, E> {
         if (this.isOk()) {
             return this.value;
         }
-        console.log(this);
-        throw new Error('called `Result.unwrap()` on an `Err` value');
+
+        throw new Error('called `Result.unwrap()` on an `Err` value: ' + this.error);
+    }
+
+    /**
+     * Returns the contained {@link Ok `Ok`} value or a default.
+     *
+     * Consumes the `this` argument then, if {@link Ok `Ok`}, returns the contained
+     * value, otherwise if {@link Err `Err`}, returns the default value for that
+     * type.
+     *
+     * @throws {UnimplementedError}
+     * @ignore Not implemented, TypeScript does not support default values.
+     * @deprecated Use {@link Result.unwrapOr `unwrapOr`} instead.
+     */
+    unwrapOrDefault(): never {
+        throw new UnimplementedError('Result.unwrapOrDefault() is not implemented');
     }
 
     /**
@@ -202,7 +220,7 @@ class Result<T, E> {
         if (this.isErr()) {
             return this.error;
         }
-        throw new Error(msg);
+        throw new Error(`${msg}: ${this.value}`);
     }
 
     /**
@@ -216,8 +234,41 @@ class Result<T, E> {
             return this.error;
         }
 
-        console.error(this.value);
-        throw new Error('called `Result.unwrapErr()` on an `Ok` value');
+        throw new Error('called `Result.unwrapErr()` on an `Ok` value: ' + this.value);
+    }
+
+    /**
+     * Returns the contained [`Ok`] value, but never panics.
+     *
+     * Unlike [`unwrap`], this method is known to never panic on the
+     * result types it is implemented for. Therefore, it can be used
+     * instead of `unwrap` as a maintainability safeguard that will fail
+     * to compile if the error type of the `Result` is later changed
+     * to an error that can actually occur.
+     *
+     * @throws {UnimplementedError}
+     * @deprecated Not yet implemented
+     * @todo Find a way to implement this
+     */
+    intoOk(): never {
+        throw new UnimplementedError('Result.intoOk() is not implemented');
+    }
+
+    /**
+     * Returns the contained [`Err`] value, but never panics.
+     *
+     * Unlike [`unwrap_err`], this method is known to never panic on the
+     * result types it is implemented for. Therefore, it can be used
+     * instead of `unwrap_err` as a maintainability safeguard that will fail
+     * to compile if the ok type of the `Result` is later changed
+     * to a type that can actually occur.
+     *
+     * @throws {UnimplementedError}
+     * @deprecated Not yet implemented
+     * @todo Find a way to implement this
+     */
+    intoErr(): never {
+        throw new UnimplementedError('Result.intoErr() is not implemented');
     }
 
     /**
@@ -240,7 +291,7 @@ class Result<T, E> {
      *
      * This function can be used for control flow based on `Result` values.
      */
-    andThen<U, F extends (x: T) => Result<U, E>>(op: F): Result<U, E> {
+    andThen<U, F extends CallableFunction>(op: F): Result<U, E> {
         if (this.isOk()) {
             return op(this.value);
         }
@@ -338,10 +389,38 @@ class Result<T, E> {
                 return None;
             }
 
+            if (
+                typeof this.value === 'object' &&
+                this.value !== null &&
+                'isSome' in this.value &&
+                'isNone' in this.value &&
+                'map' in this.value
+            ) {
+                if ((this.value as any).isSome()) {
+                    return (this.value as { map: CallableFunction }).map(Ok);
+                }
+
+                return None;
+            }
+
             return Some(Ok(this.value));
         }
 
         if (this.error === null) {
+            return None;
+        }
+
+        if (
+            typeof this.error === 'object' &&
+            this.error !== null &&
+            'isSome' in this.error &&
+            'isNone' in this.error &&
+            'map' in this.error
+        ) {
+            if ((this.error as any).isSome()) {
+                return (this.error as { map: CallableFunction }).map(Err);
+            }
+
             return None;
         }
 

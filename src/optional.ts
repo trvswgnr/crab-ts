@@ -197,7 +197,7 @@ class Optional<T> {
      * Returns an iterator over the possibly contained value.
      */
     iter(): IterableIterator<Optional<T>> {
-        return [this][Symbol.iterator]();
+        return [this].values();
     }
 
     /**
@@ -515,9 +515,9 @@ function Some<T extends {}>(value: SomeValue<T>): Some<T> {
     return new Optional(value);
 }
 
-type SomeValue<T> = T extends null | undefined | Optional<null> ? never : T;
+export type SomeValue<T> = T extends null | undefined | Optional<null> ? never : T;
 
-declare type None = Optional<any>;
+type None = Optional<any>;
 declare type Some<T> = Optional<SomeValue<T>>;
 
 /**

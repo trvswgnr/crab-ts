@@ -10,9 +10,11 @@
     "declarationMap": true, /* Generates a sourcemap for each corresponding '.d.ts' file. */
     "sourceMap": true, /* Generates corresponding '.map' file. */
     "outDir": "dist", /* Redirect output structure to the directory. */
+    "useUnknownInCatchVariables": true,
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "__tests__/**/*",
   ],
   "files": [
     "src/index.ts",
