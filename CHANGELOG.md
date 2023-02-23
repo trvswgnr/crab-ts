@@ -1,5 +1,11 @@
 # typescript-result-option
 
+## 0.2.4
+
+### Patch Changes
+
+-   b27d7ee: change Optional to Option
+
 ## 0.2.3
 
 ### Patch Changes
