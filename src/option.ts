@@ -1,4 +1,5 @@
 import { Err, Ok, Result } from './result';
+import { UnwrappedResult } from './util';
 
 /**
  * Implementation of Rust's `Option` type in TypeScript.
@@ -414,7 +415,7 @@ class Option<T> {
      * - {@link Some `Some(Ok(_))`} will be mapped to {@link Ok `Ok(Some(_))`}
      * - {@link Some `Some(Err(_))`} will be mapped to {@link Err `Err(_)`}
      */
-    transpose(): Result<Option<T extends Result<any, any> ? Unwrapped<T> : never>, any> {
+    transpose(): Result<Option<T extends Result<any, any> ? UnwrappedResult<T> : never>, any> {
         if (this.isSome()) {
             if (
                 typeof this.value === 'object' &&
@@ -530,7 +531,5 @@ function Maybe<T>(value: T): Option<T> {
     }
     return Some(value as any);
 }
-
-type Unwrapped<T> = T extends Result<infer U, any> ? U : never;
 
 export { Option, Some, Maybe, None };

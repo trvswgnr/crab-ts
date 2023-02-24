@@ -1,3 +1,6 @@
+import { Option } from './option';
+import { Result } from './result';
+
 export function assertIs<T>(x: any, expression?: boolean, ...rest: any[]): asserts x is T {
     if (expression === undefined) {
         expression = x !== null && x !== undefined;
@@ -41,3 +44,6 @@ export class UnimplementedError extends Error {
         this.name = 'UnimplementedError';
     }
 }
+
+export type UnwrappedResult<T> = T extends Result<infer U, any> ? U : never;
+export type UnwrappedOption<T> = T extends Option<infer U> ? U : never;
