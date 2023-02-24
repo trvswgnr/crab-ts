@@ -44,6 +44,11 @@
       "types": "./dist/result.d.ts",
       "import": "./dist/result.mjs",
       "default": "./dist/result.js"
+    },
+    "./match": {
+      "types": "./dist/match.d.ts",
+      "import": "./dist/match.mjs",
+      "default": "./dist/match.js"
     }
   },
   "keywords": [
