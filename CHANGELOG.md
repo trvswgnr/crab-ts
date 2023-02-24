@@ -1,5 +1,11 @@
 # typescript-result-option
 
+## 0.2.5
+
+### Patch Changes
+
+-   3764844: minor fixes
+
 ## 0.2.4
 
 ### Patch Changes
