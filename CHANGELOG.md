@@ -4,6 +4,7 @@
 
 ### Patch Changes
 
+-   24b4e40: added match functionality for Option, Result, and common types
 -   b27d7ee: change Optional to Option
 
 ## 0.2.3
