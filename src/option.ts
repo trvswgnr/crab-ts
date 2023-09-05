@@ -28,9 +28,9 @@ import { UnwrappedResult } from './util';
  * ```
  * function divide(numerator: number, denominator: number): Option<number> {
  *     if (denominator === 0) {
- *         return None
+ *         return None();
  *     } else {
- *         return Some(numerator / denominator)
+ *         return Some(numerator / denominator);
  *     }
  * }
  *
@@ -59,7 +59,8 @@ class Option<T> {
     }
 
     /**
-     * Returns `true` if the option is a {@link Some `Some`} and the value inside of it matches a predicate.
+     * Returns `true` if the option is a {@link Some `Some`} and the value inside
+     * of it matches a predicate.
      */
     isSomeAnd(f: (x: T) => boolean): boolean {
         return this.isSome() && f(this.value);
@@ -75,7 +76,8 @@ class Option<T> {
     /**
      * Returns the contained {@link Some `Some`} value, consuming the `this` value.
      *
-     * @throws {@link Error} if the value is a {@link None `None`} with a custom panic message provided by `msg`.
+     * @throws {@link Error} if the value is a {@link None `None`} with a custom
+     * panic message provided by `msg`.
      */
     expect(msg: string): T {
         if (this.isSome()) {
@@ -93,7 +95,7 @@ class Option<T> {
             return this.value;
         }
 
-        throw new Error('Called `Option.unwrap()` on a `None` value');
+        throw new Error('called `Option.unwrap()` on a `None` value');
     }
 
     /**
@@ -119,7 +121,8 @@ class Option<T> {
     }
 
     /**
-     * Maps an {@link Option<T> `Option<T>`} to {@link Option<U> `Option<U>`} by applying a function to a contained value.
+     * Maps an {@link Option<T> `Option<T>`} to {@link Option<U> `Option<U>`} by
+     * applying a function to a contained value.
      */
     map<U, F extends (x: T) => U>(f: F): Option<U> {
         if (this.isSome()) {
@@ -136,7 +139,8 @@ class Option<T> {
     }
 
     /**
-     * Calls the provided closure with a reference to the contained value (if {@link Some `Some`}).
+     * Calls the provided closure with a reference to the contained
+     * value (if {@link Some `Some`}).
      */
     inspect<F extends (x: T) => void>(f: F): Option<T> {
         if (this.isSome()) {
@@ -171,8 +175,9 @@ class Option<T> {
     }
 
     /**
-     * Transforms the {@link Option<T> `Option<T>`} into a {@link Result<T, E> `Result<T, E>`}, mapping {@link Some `Some(v)`} to
-     * {@link Ok `Ok(v)`} and {@link None `None`} to {@link Err `Err(err)`}.
+     * Transforms the `Option<T>` into a {@link Result<T, E> `Result<T, E>`},
+     * mapping {@link Some `Some(v)`} to {@link Ok `Ok(v)`} and {@link None `None`}
+     * to {@link Err `Err(err)`}.
      */
     okOr<E>(err: E): Result<T, E> {
         if (this.isSome()) {
@@ -183,8 +188,9 @@ class Option<T> {
     }
 
     /**
-     * Transforms the {@link Option<T> `Option<T>`} into a {@link Result<T, E> `Result<T, E>`}, mapping {@link Some `Some(v)`} to
-     * {@link Ok `Ok(v)`} and {@link None `None`} to {@link Err `Err(err())`}.
+     * Transforms the {@link Option<T> `Option<T>`} into a {@link Result<T, E> `Result<T, E>`},
+     * mapping {@link Some `Some(v)`} to {@link Ok `Ok(v)`} and {@link None `None`}
+     * to {@link Err `Err(err())`}.
      */
     okOrElse<E, F extends () => E>(err: F): Result<T, E> {
         if (this.isSome()) {
@@ -202,11 +208,12 @@ class Option<T> {
     }
 
     /**
-     * Returns {@link None `None`} if the option is {@link None `None`}, otherwise returns `optb`.
+     * Returns {@link None `None`} if the option is {@link None `None`},
+     * otherwise returns `optb`.
      *
-     * Arguments passed to {@link Option.and `and`} are eagerly evaluated; if you are passing the
-     * result of a function call, it is recommended to use {@link Option.andThen `andThen`}, which is
-     * lazily evaluated.
+     * Arguments passed to {@link Option.and `and`} are eagerly evaluated; if
+     * you are passing the result of a function call, it is recommended to use
+     * {@link Option.andThen `andThen`}, which is lazily evaluated.
      */
     and<U>(optb: Option<U>): Option<U> {
         if (this.isSome()) {
@@ -217,8 +224,8 @@ class Option<T> {
     }
 
     /**
-     * Returns {@link None `None`} if the option is {@link None `None`}, otherwise calls `f` with the
-     * wrapped value and returns the result.
+     * Returns {@link None `None`} if the option is {@link None `None`},
+     * otherwise calls `f` with the wrapped value and returns the result.
      *
      * Some languages call this operation flatmap.
      */
@@ -231,16 +238,17 @@ class Option<T> {
     }
 
     /**
-     * Returns {@link None `None`} if the option is {@link None `None`}, otherwise calls `predicate`
-     * with the wrapped value and returns:
+     * Returns {@link None `None`} if the option is {@link None `None`},
+     * otherwise calls `predicate` with the wrapped value and returns:
      *
-     * - {@link Some `Some(t)`} if `predicate` returns `true` (where `t` is the wrapped
-     *   value), and
+     * - {@link Some `Some(t)`} if `predicate` returns `true` (where `t` is the
+     * wrapped value), and
      * - {@link None `None`} if `predicate` returns `false`.
      *
-     * This function works similar to {@link Array.filter `Array.filter()`}. You can imagine
-     * the {@link Option `Option<T>`} being an iterator over one or zero elements. {@link Option.filter `filter()`}
-     * lets you decide which elements to keep.
+     * This function works similar to {@link Array.filter `Array.filter()`}.
+     * You can imagine the {@link Option `Option<T>`} being an iterator over one
+     * or zero elements. {@link Option.filter `filter()`} lets you decide which
+     * elements to keep.
      */
     filter<F extends (x: T) => boolean>(predicate: F): Option<T> {
         if (this.isSome()) {
@@ -255,9 +263,9 @@ class Option<T> {
     /**
      * Returns the option if it contains a value, otherwise returns `optb`.
      *
-     * Arguments passed to {@link Option.or `or`} are eagerly evaluated; if you are passing the
-     * result of a function call, it is recommended to use {@link Option.orElse `orElse`}, which is
-     * lazily evaluated.
+     * Arguments passed to {@link Option.or `or`} are eagerly evaluated; if you
+     * are passing the result of a function call, it is recommended to use
+     * {@link Option.orElse `orElse`}, which is lazily evaluated.
      */
     or(optb: Option<T>): Option<T> {
         if (this.isSome()) {
@@ -280,7 +288,8 @@ class Option<T> {
     }
 
     /**
-     * Returns {@link Some `Some`} if exactly one of `self`, `optb` is {@link Some `Some`}, otherwise returns {@link None `None`}.
+     * Returns {@link Some `Some`} if exactly one of `self`, `optb` is
+     * {@link Some `Some`}, otherwise returns {@link None `None`}.
      */
     xor(optb: Option<T>): Option<T> {
         if (this.isSome() && optb.isSome()) {
@@ -354,7 +363,8 @@ class Option<T> {
     }
 
     /**
-     * Returns `true` if the option is a {@link Some `Some`} value containing the given value.
+     * Returns `true` if the option is a {@link Some `Some`} value containing
+     * the given value.
      */
     contains<U extends T>(x: U): boolean {
         if (this.isSome()) {
@@ -367,7 +377,9 @@ class Option<T> {
     /**
      * Zips `this` with another `Option`.
      *
-     * If `this` is {@link Some `Some(s)`} and `other` is {@link Some `Some(o)`}, this method returns {@link Some `Some([s, o])`}.
+     * If `this` is {@link Some `Some(s)`} and `other` is {@link Some `Some(o)`},
+     * this method returns {@link Some `Some([s, o])`}.
+     *
      * Otherwise, `None` is returned.
      */
     zip<U>(other: Option<U>): Option<[T, U]> {
@@ -381,7 +393,9 @@ class Option<T> {
     /**
      * Zips `self` and another `Option` with function `f`.
      *
-     * If `self` is {@link Some `Some(s)`} and `other` is {@link Some `Some(o)`}, this method returns {@link Maybe `Maybe(f(s, o))}`.
+     * If `self` is {@link Some `Some(s)`} and `other` is {@link Some `Some(o)`},
+     * this method returns {@link Maybe `Maybe(f(s, o))}`.
+     *
      * Otherwise, `None` is returned.
      */
     zipWith<U, F extends (x: T, y: U) => R, R>(other: Option<U>, f: F): Option<R> {
@@ -409,7 +423,8 @@ class Option<T> {
     }
 
     /**
-     * Transposes an {@link Option `Option`} of a {@link Result  `Result`} into a {@link Result  `Result`} of an {@link Option `Option`}.
+     * Transposes an {@link Option `Option`} of a {@link Result  `Result`} into
+     * a {@link Result `Result`} of an {@link Option `Option`}.
      *
      * - {@link None `None`} will be mapped to {@link Ok `Ok`}
      * - {@link Some `Some(Ok(_))`} will be mapped to {@link Ok `Ok(Some(_))`}
@@ -466,15 +481,19 @@ class Option<T> {
     }
 
     /**
-     * {@link Object.prototype.valueOf `valueOf`} returns the primitive value of the specified object.
-     * Used to compare objects with the >, >=, <, and <= operators, but not the ==, ===, !=, and !== operators.
+     * {@link Object.prototype.valueOf `valueOf`} returns the primitive value of
+     * the specified object.
+     *
+     * Used to compare objects with the >, >=, <, and <= operators, but not
+     * the ==, ===, !=, and !== operators.
      */
     valueOf(): T {
         return this.value;
     }
 
     /**
-     * {@link Object.prototype.toString `toString`} returns a string representing the specified object.
+     * {@link Object.prototype.toString `toString`} returns a string representing
+     * the specified object.
      */
     toString(): string {
         return String(this.value);
