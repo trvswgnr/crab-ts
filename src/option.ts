@@ -126,13 +126,13 @@ class Option<T> {
             const value = f(this.value);
 
             if (value === null || typeof value === 'undefined') {
-                return _None();
+                return None();
             }
 
             return Some(value as any);
         }
 
-        return _None();
+        return None();
     }
 
     /**
@@ -213,7 +213,7 @@ class Option<T> {
             return optb;
         }
 
-        return _None();
+        return None();
     }
 
     /**
@@ -227,7 +227,7 @@ class Option<T> {
             return f(this.value);
         }
 
-        return _None();
+        return None();
     }
 
     /**
@@ -249,7 +249,7 @@ class Option<T> {
             }
         }
 
-        return _None();
+        return None();
     }
 
     /**
@@ -284,7 +284,7 @@ class Option<T> {
      */
     xor(optb: Option<T>): Option<T> {
         if (this.isSome() && optb.isSome()) {
-            return _None();
+            return None();
         }
 
         if (this.isSome()) {
@@ -295,7 +295,7 @@ class Option<T> {
             return optb;
         }
 
-        return _None();
+        return None();
     }
 
     /**
@@ -336,7 +336,7 @@ class Option<T> {
             return Some(value as any);
         }
 
-        return _None();
+        return None();
     }
 
     /**
@@ -348,7 +348,7 @@ class Option<T> {
         const oldValue = this.value;
         this.value = newValue;
         if (oldValue === null || typeof oldValue === 'undefined') {
-            return _None();
+            return None();
         }
         return Some(oldValue as any);
     }
@@ -375,7 +375,7 @@ class Option<T> {
             return Some([this.value, other.value]);
         }
 
-        return _None();
+        return None();
     }
 
     /**
@@ -389,14 +389,14 @@ class Option<T> {
             return Maybe(f(this.value, other.value));
         }
 
-        return _None();
+        return None();
     }
 
     /**
      * Unzips an option containing a tuple of two options.
      *
      * If `self` is `Some([a, b])` this method returns `[Some(a), Some(b)]`.
-     * Otherwise, `[None, None]` is returned.
+     * Otherwise, `[None(), None()]` is returned.
      */
     unzip<U>(): [Option<T>, Option<U>] {
         if (this.isSome()) {
@@ -405,7 +405,7 @@ class Option<T> {
             }
         }
 
-        return [_None(), _None()];
+        return [None(), None()];
     }
 
     /**
@@ -434,7 +434,7 @@ class Option<T> {
             throw new Error('Value is not a Result');
         }
 
-        return Ok(_None());
+        return Ok(None());
     }
 
     /* Equality */
@@ -484,20 +484,14 @@ class Option<T> {
 /**
  * Creates a new {@link Option `Option`} with no value.
  */
-function _None() {
-    return new Option(null) as None;
+function None<T>(): Option<T> {
+    return new Option(null) as Option<T>;
 }
-
-/**
- * No value.
- */
-declare const None: None;
-Object.defineProperty(exports, 'None', { get: _None });
 
 /**
  * Some value of type `T`.
  */
-function Some<T extends {}>(value: SomeValue<T>): Some<T> {
+function Some<T extends {}>(value: SomeValue<T>): Option<T> {
     if (value === null || typeof value === 'undefined') {
         throw new Error('Tried to create Some() with a null or undefined value.');
     }
@@ -527,7 +521,7 @@ declare type Some<T> = Option<SomeValue<T>>;
  */
 function Maybe<T>(value: T): Option<T> {
     if (value === null || typeof value === 'undefined') {
-        return _None();
+        return None();
     }
     return Some(value as any);
 }

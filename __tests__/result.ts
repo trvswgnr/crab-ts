@@ -93,14 +93,14 @@ describe('Result', () => {
             expect(x.ok()).toEqual(Some(2));
 
             const x2: Result<number, string> = Err('Nothing here');
-            expect(x2.ok()).toEqual(None);
+            expect(x2.ok()).toEqual(None());
         });
     });
 
     describe('err', () => {
         it('converts from Result<T, E> to Option<E>', () => {
             const x: Result<number, string> = Ok(2);
-            expect(x.err()).toEqual(None);
+            expect(x.err()).toEqual(None());
 
             const x2: Result<number, string> = Err('Nothing here');
             expect(x2.err()).toEqual(Some('Nothing here'));
@@ -198,7 +198,7 @@ describe('Result', () => {
             expect(x.iter().next().value).toEqual(Some(7));
 
             const x2: Result<number, string> = Err('nothing!');
-            expect(x2.iter().next().value).toEqual(None);
+            expect(x2.iter().next().value).toEqual(None());
         });
     });
 
@@ -391,9 +391,9 @@ describe('Result', () => {
             expect(x.transpose()).toEqual(y);
         });
 
-        it('`Ok(None)` will be mapped to `None`.', () => {
-            const x: Result<Option<number>, Error> = Ok(None);
-            const y: Option<Result<number, Error>> = None;
+        it('`Ok(None())` will be mapped to `None`.', () => {
+            const x: Result<Option<number>, Error> = Ok(None());
+            const y: Option<Result<number, Error>> = None();
             expect(x.transpose()).toEqual(y);
         });
 
@@ -406,8 +406,8 @@ describe('Result', () => {
             const y2: Option<Result<number, number>> = Some(Err(5));
             expect(x2.transpose()).toEqual(y2);
 
-            const x3: Result<Option<number>, Option<number>> = Err(None);
-            const y3: Option<Result<number, number>> = None;
+            const x3: Result<Option<number>, Option<number>> = Err(None());
+            const y3: Option<Result<number, number>> = None();
             expect(x3.transpose()).toEqual(y3);
 
             const x4: Result<Option<number>, number> = Err(5);

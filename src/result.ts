@@ -53,13 +53,13 @@ class Result<T, E> {
     ok(): Option<T> {
         if (this.isOk()) {
             if (typeof this.value === 'undefined' || this.value === null) {
-                return None;
+                return None();
             }
 
             return Some(this.value as any);
         }
 
-        return None;
+        return None();
     }
 
     /**
@@ -73,7 +73,7 @@ class Result<T, E> {
             return new Option(this.error);
         }
 
-        return None;
+        return None();
     }
 
     /**
@@ -163,13 +163,13 @@ class Result<T, E> {
     iter(): IterableIterator<Option<T>> {
         if (this.isOk()) {
             if (typeof this.value === 'undefined' || this.value === null) {
-                return [None].values();
+                return [None<T>()].values();
             }
 
             return [Some(this.value as {}) as Option<T>].values();
         }
 
-        return [None].values();
+        return [None<T>()].values();
     }
 
     /**
@@ -379,13 +379,13 @@ class Result<T, E> {
 
     /**
      * Transposes a `Result` of an `Option` into an `Option` of a `Result`.
-     * `Ok(None)` will be mapped to `None`.
+     * `Ok(None())` will be mapped to `None`.
      * `Ok(Some(_))` and `Err(_)` will be mapped to `Some(Ok(_))` and `Some(Err(_))`.
      */
     transpose(): Option<Result<T, E>> {
         if (this.isOk()) {
             if (this.value === null) {
-                return None;
+                return None();
             }
 
             if (
@@ -399,14 +399,14 @@ class Result<T, E> {
                     return (this.value as { map: CallableFunction }).map(Ok);
                 }
 
-                return None;
+                return None();
             }
 
             return Some(Ok(this.value));
         }
 
         if (this.error === null) {
-            return None;
+            return None();
         }
 
         if (
@@ -420,7 +420,7 @@ class Result<T, E> {
                 return (this.error as { map: CallableFunction }).map(Err);
             }
 
-            return None;
+            return None();
         }
 
         return Some(Err(this.error));
