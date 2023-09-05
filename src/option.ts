@@ -496,17 +496,6 @@ function Some<T extends {}>(value: SomeValue<T>): Option<T> {
         throw new Error('Tried to create Some() with a null or undefined value.');
     }
 
-    const isNoneOption =
-        typeof value === 'object' &&
-        value !== null &&
-        'isNone' in value &&
-        typeof value.isNone === 'function' &&
-        value.isNone();
-
-    if (isNoneOption) {
-        throw new Error('Tried to create Some() with a None value.');
-    }
-
     return new Option(value);
 }
 
