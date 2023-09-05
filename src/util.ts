@@ -13,6 +13,52 @@ export function assertIs<T>(x: any, expression?: boolean, ...rest: any[]): asser
     }
 }
 
+// typescript impl of rust's assert_eq! macro
+export function assertEq<T>(left: T, right: T, msg?: string): void {
+    if (JSON.stringify(left) !== JSON.stringify(right)) {
+        throw new Error(dedent`
+            assertion \`left === right\` failed${msg ? `: ${msg}` : ''}:
+              left: ${String(left)}
+             right: ${String(right)}
+        `);
+    }
+}
+
+/**
+transforms a string so that it doesn't include
+the leading whitespace.
+Example:
+```ts
+    const s = stringDedent`
+        hello
+        world
+    `;
+    // s === 'hello\nworld\n'
+```
+*/
+export function dedent(strings: TemplateStringsArray, ...values: any[]) {
+    // merge the strings with the substitution values
+    const fullString = strings.reduce(
+        (result, string, i) => result + string + (values[i] || ''),
+        '',
+    );
+
+    // split the string into lines
+    const lines = fullString.split('\n');
+
+    // find the smallest indentation level, ignoring lines that are empty or contain only whitespace
+    const minIndent = lines.reduce((min, line) => {
+        const match = line.match(/^( *)\S/);
+        return match ? Math.min(min, match[1].length) : min;
+    }, Infinity);
+
+    // Remove the indentation
+    return lines
+        .map((line) => line.slice(minIndent))
+        .join('\n')
+        .trim();
+}
+
 /**
  * Enum of JavaScript error types.
  */
