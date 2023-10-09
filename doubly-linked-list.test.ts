@@ -57,7 +57,7 @@ test("pushBack", () => {
     expect(n.popBack()).toBe(1);
 });
 
-test.skip("append", () => {
+test("append", () => {
     // empty to empy
     {
         let m = new LinkedList<number>();
@@ -67,6 +67,7 @@ test.skip("append", () => {
         expect(m.len()).toBe(0);
         expect(n.len()).toBe(0);
     }
+
     // non-empty to empty
     {
         let m = new LinkedList<number>();
@@ -74,12 +75,32 @@ test.skip("append", () => {
         n.pushBack(2);
         expect(n.len()).toBe(1);
         m.append(n);
-        // checkLinks(m);
+        checkLinks(m);
         expect(m.len()).toBe(1);
         expect(m.popBack()).toBe(2);
         expect(n.len()).toBe(0);
-        // checkLinks(m);
+        checkLinks(m);
     }
+
+    // non-empty to non-empty
+    let v = [0, 1, 2, 3, 4, 5, 6];
+    let u = [7, 8, 9, 10, 11, 12, 13];
+    let m = listFrom(v);
+    let n = listFrom(u);
+    m.append(n);
+    checkLinks(m);
+    let sum = v.concat(u);
+    expect(sum.length).toBe(m.len());
+    for (const elt of sum) {
+        expect(m.popFront()).toBe(elt);
+    }
+    expect(n.len()).toBe(0);
+    // Let's make sure it's working properly, since we
+    // did some direct changes to private members.
+    n.pushBack(3);
+    expect(n.len()).toBe(1);
+    expect(n.popFront()).toBe(3);
+    checkLinks(n);
 });
 
 function checkLinks<T>(list: &LinkedList<T>) {

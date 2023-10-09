@@ -117,23 +117,22 @@ export class LinkedList<T> {
 
     append(other: this): void {
         if (!this.tail) {
-            let otherHead = other.head;
-            while (otherHead !== null) {
-                let next = otherHead.next;
-                this.pushBackNode(otherHead);
-                otherHead = next;
-            }
+            this.head = other.head;
+            this.tail = other.tail;
+            this._len = other._len;
+            other._len = 0;
+            other.head = null;
+            other.tail = null;
         } else {
-            console.log("has tail");
             if (other.head) {
-                console.log("has other head");
                 this.tail.next = other.head;
                 other.head.prev = this.tail;
-
                 this.tail = other.tail;
                 this._len += other._len;
-            } else {
-                console.log("no other head");
+
+                other.head = null;
+                other.tail = null;
+                other._len = 0;
             }
         }
     }
@@ -237,7 +236,7 @@ export class LinkedList<T> {
         if (this.tail === null) {
             return null;
         }
-        this.tail.map((node) => {
+        return this.tail.map((node) => {
             this.tail = node.prev;
             if (this.tail === null) {
                 this.head = null;
@@ -247,8 +246,6 @@ export class LinkedList<T> {
             this._len -= 1;
             return node;
         });
-
-        return this.tail;
     }
 
     splitOff(at: number): LinkedList<T> {
