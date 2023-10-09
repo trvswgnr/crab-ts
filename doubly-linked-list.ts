@@ -1,77 +1,11 @@
-type Option<T> = T | null;
+export type Option<T> = T | null;
 
-
-import * as mem from './mem';
-
-
-interface ILinkedList<T> {
-    head: Option<INode<T>>;
-    tail: Option<INode<T>>;
-    _len: number;
-    [Symbol.dispose](): void;
-    append(other: LinkedList<T>): void;
-    clear(): void;
-    contains(x: T): boolean;
-    isEmpty(): boolean;
-    len(): number;
-    iter(): IIter<T>;
-    front(): Option<T>;
-    back(): Option<T>;
-    pushFront(x: T): void;
-    pushBack(x: T): void;
-    popFront(): Option<T>;
-    popBack(): Option<T>;
-    splitOff(at: number): LinkedList<T>;
-    remove(at: number): T;
-    extractIf<F extends (x: T) => boolean>(f: F): LinkedList<T>;
-
-    cursorFront(): ICursor<T>;
-    cursorBack(): ICursor<T>;
-
-    unlinkNode(node: INode<T>): void;
-}
-
-interface INode<T> {
-    next: Option<INode<T>>;
-    prev: Option<INode<T>>;
-    element: T;
-    map<U>(f: (x: INode<T>) => U): Option<U>;
-    intoElement(): T;
-    take(): Option<INode<T>>;
-    [Symbol.dispose](): void;
-}
-
-interface IIter<T> {
-    head: Option<INode<T>>;
-    tail: Option<INode<T>>;
-    _len: number;
-
-    any(f: (x: T) => boolean): boolean;
-    next(): Option<T>;
-    nextBack(): Option<T>;
-}
-
-interface ICursor<T> {
+export class Cursor<T> {
     _index: number;
-    _current: Option<INode<T>>;
-    list: ILinkedList<T>;
-    index(): Option<number>;
-    moveNext(): void;
-    movePrev(): void;
-    current(): Option<T>;
-    peekNext(): Option<T>;
-    peekPrev(): Option<T>;
-    front(): Option<T>;
-    back(): Option<T>;
-    removeCurrent(): Option<T>;
-}
+    _current: Option<Node<T>>;
+    list: LinkedList<T>;
 
-class Cursor<T> implements ICursor<T> {
-    _index: number;
-    _current: Option<INode<T>>;
-    list: ILinkedList<T>;
-
-    constructor(index: number, current: Option<INode<T>>, list: ILinkedList<T>) {
+    constructor(index: number, current: Option<Node<T>>, list: LinkedList<T>) {
         this._index = index;
         this._current = current;
         this.list = list;
@@ -106,7 +40,7 @@ class Cursor<T> implements ICursor<T> {
     }
 
     peekNext(): Option<T> {
-        let next: Option<INode<T>>;
+        let next: Option<Node<T>>;
         if (this._current === null) {
             next = this.list.head;
         } else {
@@ -116,7 +50,7 @@ class Cursor<T> implements ICursor<T> {
     }
 
     peekPrev(): Option<T> {
-        let prev: Option<INode<T>>;
+        let prev: Option<Node<T>>;
         if (this._current === null) {
             prev = this.list.tail;
         } else {
@@ -141,13 +75,9 @@ class Cursor<T> implements ICursor<T> {
     }
 }
 
-interface IIntoIter<T> {
-    list: ILinkedList<T>;
-}
-
-class Node<T> implements INode<T> {
-    next: Option<INode<T>>;
-    prev: Option<INode<T>>;
+export class Node<T> {
+    next: Option<Node<T>>;
+    prev: Option<Node<T>>;
     element: T;
 
     constructor(element: T) {
@@ -160,12 +90,12 @@ class Node<T> implements INode<T> {
         return this.element;
     }
 
-    map<U>(f: (x: INode<T>) => U): Option<U> {
+    map<U>(f: (x: Node<T>) => U): Option<U> {
         return f(this);
     }
 
-    take(): Option<INode<T>> {
-        return mem.replace(this, null);
+    take(): Option<Node<T>> {
+        return this;
     }
 
     [Symbol.dispose](): void {
@@ -174,9 +104,9 @@ class Node<T> implements INode<T> {
     }
 }
 
-class LinkedList<T> implements ILinkedList<T> {
-    head: Option<INode<T>>;
-    tail: Option<INode<T>>;
+export class LinkedList<T> {
+    head: Option<Node<T>>;
+    tail: Option<Node<T>>;
     _len: number;
 
     constructor() {
@@ -185,17 +115,26 @@ class LinkedList<T> implements ILinkedList<T> {
         this._len = 0;
     }
 
-    append(other: LinkedList<T>): void {
+    append(other: this): void {
         if (!this.tail) {
-            mem.swap(this, other);
+            let otherHead = other.head;
+            while (otherHead !== null) {
+                let next = otherHead.next;
+                this.pushBackNode(otherHead);
+                otherHead = next;
+            }
         } else {
-            if (other.head !== null) {
+            console.log("has tail");
+            if (other.head) {
+                console.log("has other head");
                 this.tail.next = other.head;
                 other.head.prev = this.tail;
-            }
 
-            this.tail = other.tail;
-            this._len += mem.replace(other._len, 0);
+                this.tail = other.tail;
+                this._len += other._len;
+            } else {
+                console.log("no other head");
+            }
         }
     }
 
@@ -207,16 +146,16 @@ class LinkedList<T> implements ILinkedList<T> {
         return this._len;
     }
 
-    iter(): IIter<T> {
+    iter(): Iter<T> {
         return new Iter(this);
     }
 
     [Symbol.dispose](): void {
-        let mut_head = mem.replace(this.head, null);
-        while (mut_head !== null) {
-            let next = mem.replace(mut_head.next, null);
-            mem.drop(mut_head);
-            mut_head = next;
+        let head = this.head;
+        while (head !== null) {
+            let next = head.next;
+            head[Symbol.dispose]();
+            head = next;
         }
     }
 
@@ -241,7 +180,7 @@ class LinkedList<T> implements ILinkedList<T> {
         this.pushFrontNode(node);
     }
 
-    private pushFrontNode(node: INode<T>): void {
+    private pushFrontNode(node: Node<T>): void {
         node.next = this.head;
         node.prev = null;
         if (this.head === null) {
@@ -258,7 +197,7 @@ class LinkedList<T> implements ILinkedList<T> {
         this.pushBackNode(node);
     }
 
-    private pushBackNode(node: INode<T>): void {
+    private pushBackNode(node: Node<T>): void {
         node.next = null;
         node.prev = this.tail;
         if (this.tail === null) {
@@ -271,14 +210,14 @@ class LinkedList<T> implements ILinkedList<T> {
     }
 
     popFront(): Option<T> {
-        return this.popFrontNode()?.map((node) => node.intoElement()) ?? null;
+        return this.popFrontNode()?.map((node) => node.element) ?? null;
     }
 
-    private popFrontNode(): Option<INode<T>> {
+    private popFrontNode(): Option<Node<T>> {
         if (this.head === null) {
             return null;
         }
-        this.head.map((node) => {
+        return this.head.map((node) => {
             this.head = node.next;
             if (this.head === null) {
                 this.tail = null;
@@ -288,15 +227,13 @@ class LinkedList<T> implements ILinkedList<T> {
             this._len -= 1;
             return node;
         });
-
-        return this.head;
     }
 
     popBack(): Option<T> {
-        return this.popBackNode()?.map((node) => node.intoElement()) ?? null;
+        return this.popBackNode()?.map((node) => node.element) ?? null;
     }
 
-    private popBackNode(): Option<INode<T>> {
+    private popBackNode(): Option<Node<T>> {
         if (this.tail === null) {
             return null;
         }
@@ -316,14 +253,14 @@ class LinkedList<T> implements ILinkedList<T> {
 
     splitOff(at: number): LinkedList<T> {
         let len = this.len();
-        _assert(at <= len, "Cannot split off at a nonexistent index");
+        throwIfNot(at <= len, "Cannot split off at a nonexistent index");
         if (at === 0) {
-            return mem.replace(this, new LinkedList());
+            return this;
         } else if (at === len) {
             return new LinkedList();
         }
 
-        let splitNode: Option<INode<T>> = null;
+        let splitNode: Option<Node<T>> = null;
         if (at - 1 <= len - 1 - (at - 1)) {
             let iter = this.iter();
             for (let _ = 0; _ < at - 1; _++) {
@@ -340,10 +277,10 @@ class LinkedList<T> implements ILinkedList<T> {
         return this.splitOffAfterNode(splitNode, at);
     }
 
-    private splitOffAfterNode(splitNode: Option<INode<T>>, at: number): LinkedList<T> {
+    private splitOffAfterNode(splitNode: Option<Node<T>>, at: number): LinkedList<T> {
         if (splitNode) {
-            let secondPartHead: Option<INode<T>>;
-            let secondPartTail: Option<INode<T>>;
+            let secondPartHead: Option<Node<T>>;
+            let secondPartTail: Option<Node<T>>;
             secondPartHead = splitNode.next?.take() ?? null;
 
             if (secondPartHead) {
@@ -364,12 +301,12 @@ class LinkedList<T> implements ILinkedList<T> {
             return secondPart;
         }
 
-        return mem.replace(this, new LinkedList());
+        return this;
     }
 
     remove(at: number): T {
         let len = this.len();
-        _assert(at < len, "Cannot remove at an index outside of the list bounds");
+        throwIfNot(at < len, "Cannot remove at an index outside of the list bounds");
 
         let offsetFromEnd = len - at - 1;
         if (at <= offsetFromEnd) {
@@ -387,22 +324,22 @@ class LinkedList<T> implements ILinkedList<T> {
         }
     }
 
-    cursorFront(): ICursor<T> {
+    cursorFront(): Cursor<T> {
         return new Cursor(0, null, this);
     }
 
-    cursorBack(): ICursor<T> {
+    cursorBack(): Cursor<T> {
         return new Cursor(this.len() - 1, null, this);
     }
 
     extractIf<F extends (x: T) => boolean>(filter: F): ExtractIf<T, F> {
-       let it = this.head;
-       let oldLen = this.len();
+        let it = this.head;
+        let oldLen = this.len();
 
-       return new ExtractIf(this, it, filter, 0, oldLen);
+        return new ExtractIf(this, it, filter, 0, oldLen);
     }
 
-    unlinkNode(node: INode<T>): void {
+    unlinkNode(node: Node<T>): void {
         if (node.prev) {
             node.prev.next = node.next;
         } else {
@@ -419,9 +356,9 @@ class LinkedList<T> implements ILinkedList<T> {
     }
 }
 
-class Iter<T> implements IIter<T> {
-    head: Option<INode<T>>;
-    tail: Option<INode<T>>;
+export class Iter<T> {
+    head: Option<Node<T>>;
+    tail: Option<Node<T>>;
     _len: number;
 
     constructor(list: LinkedList<T>) {
@@ -431,12 +368,12 @@ class Iter<T> implements IIter<T> {
     }
 
     any(f: (x: T) => boolean): boolean {
-        let mut_head = this.head;
-        while (mut_head !== null) {
-            if (f(mut_head.element)) {
+        let head = this.head;
+        while (head !== null) {
+            if (f(head.element)) {
                 return true;
             }
-            mut_head = mut_head.next;
+            head = head.next;
         }
         return false;
     }
@@ -454,31 +391,43 @@ class Iter<T> implements IIter<T> {
             return node.intoElement();
         }) ?? null;
     }
-}
 
+    [Symbol.dispose](): void {
+        this.head = null;
+        this.tail = null;
+    }
 
-function _assert(condition: boolean, message: string): void {
-    if (!condition) {
-        throw new Error(message);
+    *[Symbol.iterator](): Generator<T> {
+        let head = this.head;
+        while (head !== null) {
+            yield head.element;
+            head = head.next;
+        }
     }
 }
 
 
-class ExtractIf<
+export class ExtractIf<
     T,
-    F extends (x:T) => boolean,
+    F extends (x: T) => boolean,
 > {
-    list: ILinkedList<T>;
-    it: Option<INode<T>>;
+    list: LinkedList<T>;
+    it: Option<Node<T>>;
     pred: F;
     idx: number;
     old_len: number;
 
-    constructor(list: ILinkedList<T>, it: Option<INode<T>>, pred: F, idx: number, old_len: number) {
+    constructor(list: LinkedList<T>, it: Option<Node<T>>, pred: F, idx: number, old_len: number) {
         this.list = list;
         this.it = it;
         this.pred = pred;
         this.idx = idx;
         this.old_len = old_len;
+    }
+}
+
+function throwIfNot(condition: boolean, message: string): void {
+    if (!condition) {
+        throw new Error(message);
     }
 }
