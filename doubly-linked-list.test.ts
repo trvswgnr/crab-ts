@@ -1,6 +1,18 @@
 import { LinkedList, Node, type Option } from "./doubly-linked-list";
 import { expect, test } from "bun:test";
 
+function generateTest(): LinkedList<number> {
+    return listFrom([0, 1, 2, 3, 4, 5, 6]);
+}
+
+function listFrom<T>(arr: T[]): LinkedList<T> {
+    let m = new LinkedList<T>();
+    for (let i = 0; i < arr.length; i++) {
+        m.pushBack(arr[i]);
+    }
+    return m;
+}
+
 test("basic", () => {
     let m = new LinkedList<number>();
     expect(m.popFront()).toBe(null);
@@ -103,21 +115,21 @@ test("append", () => {
     checkLinks(n);
 });
 
-function checkLinks<T>(list: &LinkedList<T>) {
+function checkLinks<T>(list: & LinkedList<T>) {
     let len = 0;
     let last: Option<Node<T>> = null;
     let node: Node<T>;
-    
+
     if (list.head === null) {
         expect(list.tail).toBe(null);
-        expect(list._len).toBe(0);
+        expect(list.length).toBe(0);
         return;
     } else {
         node = list.head;
     }
 
     while (true) {
-        if (last === null && node.prev === null) {}
+        if (last === null && node.prev === null) { }
         if (last && node.prev) {
             expect(last).toBe(node.prev);
         }
@@ -134,17 +146,52 @@ function checkLinks<T>(list: &LinkedList<T>) {
     // verify that the tail node points to the last node
     expect(list.tail).toBe(node);
     // verify that the length is correct
-    expect(list._len).toBe(len);
+    expect(list.len()).toBe(len);
 }
 
-function generateTest(): LinkedList<number> {
-    return listFrom([0, 1, 2, 3, 4, 5, 6]);
-}
-
-function listFrom<T>(arr: T[]): LinkedList<T> {
-    let m = new LinkedList<T>();
-    for (let i = 0; i < arr.length; i++) {
-        m.pushBack(arr[i]);
+test("iterator", () => {
+    let m = generateTest();
+    for (const [i, elt] of m.iter().enumerate()) {
+        expect(i).toBe(elt);
     }
-    return m;
-}
+    let n = new LinkedList<number>();
+    expect(n.iter().next()).toBe(null);
+    n.pushFront(4);
+    let it = n.iter();
+    expect(it.sizeHint()).toEqual([1, 1]);
+    expect(it.next()).toBe(4);
+    expect(it.sizeHint()).toEqual([0, 0]);
+    expect(it.next()).toBe(null);
+});
+
+test("iterator clone", () => {
+    let n = new LinkedList<number>();
+    n.pushBack(2);
+    n.pushBack(3);
+    n.pushBack(4);
+    let it = n.iter();
+    it.next();
+    let jt = it.clone();
+    expect(it).not.toBe(jt);
+    expect(it.head).not.toBe(jt.head);
+    expect(it.next()).toBe(jt.next());
+    expect(it.nextBack()).toBe(jt.nextBack());
+    expect(it.next()).toBe(jt.next());
+});
+
+test("iterator double end", () => {
+    let n = new LinkedList<number>();
+    expect(n.iter().next()).toBe(null);
+    n.pushFront(4);
+    n.pushFront(5);
+    n.pushFront(6);
+    let it = n.iter();
+    expect(it.sizeHint()).toEqual([3, 3]);
+    expect(it.next()).toBe(6);
+    expect(it.sizeHint()).toEqual([2, 2]);
+    expect(it.nextBack()).toBe(4);
+    expect(it.sizeHint()).toEqual([1, 1]);
+    expect(it.nextBack()).toBe(5);
+    expect(it.nextBack()).toBe(null);
+    expect(it.next()).toBe(null);
+});
