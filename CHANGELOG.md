@@ -1,5 +1,11 @@
 # typescript-result-option
 
+## 0.3.0
+
+### Minor Changes
+
+-   335b948: updated to use function instead of wizardry for better compatibility
+
 ## 0.2.5
 
 ### Patch Changes

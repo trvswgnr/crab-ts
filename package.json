@@ -1,6 +1,6 @@
 {
   "name": "typescript-result-option",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "Implementation of Rust's Result and Option in TypeScript.",
   "private": false,
   "repository": "https://github.com/trvswgnr/typescript-result-option",
