@@ -11,7 +11,7 @@
 - [Usage](#usage)
   - [StdIterator](#stditerator)
   - [Chain](#chain)
-  - [Traits](#traits)
+  - [Traits & More](#traits--more
 - [Examples](#examples)
 - [Contributing](#contributing)
 - [License](#license)
@@ -59,9 +59,9 @@ const iterator2 = new MyIterator();
 const chained = new Chain(iterator1, iterator2);
 ```
 
-### Traits
+### Traits & More
 
-Utility traits like `Option`, `Result`, and `IntoIterator` are provided for easier manipulation of data and error handling.
+Utilities like `Option`, `Result`, and `IntoIterator` are provided for easier manipulation of data and error handling.
 
 ```ts
 import { Option, Result, IntoIterator } from 'crab-ts';
