@@ -11,7 +11,7 @@
 - [Usage](#usage)
   - [StdIterator](#stditerator)
   - [Chain](#chain)
-  - [Traits & More](#traits--more
+  - [Traits & More](#traits--more)
 - [Examples](#examples)
 - [Contributing](#contributing)
 - [License](#license)
