@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { StdIterator } from "./iterator";
 import { Option } from "./traits";
 
-class TestIter<Item> extends StdIterator<Item> {
+class Iter<Item> extends StdIterator<Item> {
     index = 0;
     length = 0;
     constructor(public items: Item[]) {
@@ -25,20 +25,23 @@ class TestIter<Item> extends StdIterator<Item> {
     }
 }
 
-class Foo<T> {
+type Vec<T> = {
     items: T[];
-    constructor(...items: T[]) {
-        this.items = items;
-    }
+    iter(): Iter<T>;
+};
 
-    iter() {
-        return new TestIter(this.items);
-    }
+function Vec<T>(...items: T[]): Vec<T> {
+    return {
+        items,
+        iter() {
+            return new Iter(this.items);
+        }
+    };
 }
 
 
 test("iter", () => {
-    const a = new Foo(1, 2, 3);
+    const a = Vec(1, 2, 3);
     let iter = a.iter();
     // a call to next() returns the next value...
     expect(iter.next()).toBe(1);
@@ -54,7 +57,7 @@ test("iter", () => {
 });
 
 test("sizeHint", () => {
-    let a = new Foo(1, 2, 3);
+    let a = Vec(1, 2, 3);
     let iter = a.iter();
 
     expect(iter.sizeHint()).toEqual([3, 3]);
@@ -63,10 +66,10 @@ test("sizeHint", () => {
 });
 
 test("count", () => {
-    let a = new Foo(1, 2, 3);
+    let a = Vec(1, 2, 3);
     expect(a.iter().count()).toBe(3);
 
-    a = new Foo(1, 2, 3, 4, 5);
+    a = Vec(1, 2, 3, 4, 5);
     let iter = a.iter();
     expect(iter.count()).toBe(5);
 
@@ -75,10 +78,10 @@ test("count", () => {
 });
 
 test("last", () => {
-    let a = new Foo(1, 2, 3);
+    let a = Vec(1, 2, 3);
     expect(a.iter().last()).toBe(3);
 
-    a = new Foo(5);
+    a = Vec(5);
     let iter = a.iter();
     expect(iter.last()).toBe(5);
 
@@ -87,27 +90,37 @@ test("last", () => {
 });
 
 test("advanceBy", () => {
-    let a = new Foo(1, 2, 3);
+    let a = Vec(1, 2, 3);
     let iter = a.iter();
     expect(iter.advanceBy(0)).toEqual([void 0, null]);
 });
 
 test("nth", () => {
-    let a = new Foo(1, 2, 3);
+    let a = Vec(1, 2, 3);
     let iter = a.iter();
     expect(iter.nth(1)).toBe(2);
 
     // calling `nth` multiple times doesn't rewind the iterator
-    let b = new Foo(1, 2, 3);
+    let b = Vec(1, 2, 3);
     let iter2 = b.iter();
     expect(iter2.nth(1)).toBe(2);
     expect(iter2.nth(1)).toBe(null);
 
     // returns `null` if there are less than `n + 1` elements
-    let c = new Foo(1, 2, 3);
+    let c = Vec(1, 2, 3);
     let iter3 = c.iter();
     expect(iter3.nth(10)).toBe(null);
 });
 
-// test("stepBy", () => {
-// });
+test("chain", () => {
+    let a1 = Vec(1, 2, 3);
+    let a2 = Vec(4, 5, 6);
+    let iter = a1.iter().chain(a2.iter());
+    expect(iter.next()).toBe(1);
+    expect(iter.next()).toBe(2);
+    expect(iter.next()).toBe(3);
+    expect(iter.next()).toBe(4);
+    expect(iter.next()).toBe(5);
+    expect(iter.next()).toBe(6);
+    expect(iter.next()).toBe(null);
+});

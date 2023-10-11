@@ -1,13 +1,9 @@
 import { Default, Option, staticImplements } from './traits';
 import { StdIterator } from './iterator';
 
-type Class = abstract new (...args: any[]) => any;
-
 @staticImplements<Default>
-export class Chain<Item, A extends Iterable<Item> = Iterable<Item>, B extends Iterable<Item> = Iterable<Item>> extends StdIterator<Item> {
-    constructor(public a: A, public b: B) {
-        super();
-    }
+export class Chain<Item, A extends Iterable<Item> = Iterable<Item>, B extends Iterable<Item> = Iterable<Item>> {
+    constructor(public a: A, public b: B) {}
 
     static default<Item>() {
         return new Chain<Item>([], []);

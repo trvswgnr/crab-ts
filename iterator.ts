@@ -31,7 +31,7 @@ export abstract class StdIterator<Item> implements Iterable<Item> {
         return this.fold(false, (acc, item) => acc || f(item));
     }
 
-    chain<U extends {iter(): any}>(other: U): Chain<Item, this, Iterable<Item>> {
+    chain<U extends StdIterator<Item>>(other: U): Chain<Item, this, Iterable<Item>> {
         return new Chain(this, other.iter());
     }
 
@@ -95,6 +95,10 @@ export abstract class StdIterator<Item> implements Iterable<Item> {
 
     intersperseWith<G extends () => Item>(separator: G): any {
         throw new Error("Method `intersperseWith` is not implemented.");
+    }
+
+    iter(): StdIterator<Item> {
+        return this;
     }
 
     last(): Option<Item> {
