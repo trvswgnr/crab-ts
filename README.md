@@ -1,7 +1,7 @@
 # Crab TS
 
 > [!WARNING]  
-> Right now this project is just something I'm doing for fun. It is not—and may not ever be—meant for use in any serious capacity.
+> This project is just something I'm doing for fun. It is not—and may not ever be—meant for use in any serious capacity.
 
 ## Table of Contents
 
