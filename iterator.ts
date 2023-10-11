@@ -47,23 +47,23 @@ export abstract class StdIterator<Item> implements Iterable<Item> {
         return this.fold(0, (acc, _) => acc + 1);
     }
 
-    enumerate(): any {
+    enumerate(): Iterable<[number, Item]> {
         throw new Error("Method `enumerate` is not implemented.");
     }
 
-    filter<P extends (a: Item) => boolean>(predicate: P): any {
+    filter<P extends (a: Item) => boolean>(predicate: P): never {
         throw new Error("Method `filter` is not implemented.");
     }
 
-    filterMap<B, F extends (a: Item) => Option<B>>(f: F): any {
+    filterMap<B, F extends (a: Item) => Option<B>>(f: F): never {
         throw new Error("Method `filterMap` is not implemented.");
     }
 
-    flatMap<B, F extends (a: Item) => Iterable<B>>(f: F): any {
+    flatMap<B, F extends (a: Item) => Iterable<B>>(f: F): never {
         throw new Error("Method `flatMap` is not implemented.");
     }
 
-    flatten(): any {
+    flatten(): never {
         throw new Error("Method `flatten` is not implemented.");
     }
 
@@ -81,19 +81,19 @@ export abstract class StdIterator<Item> implements Iterable<Item> {
         }
     }
 
-    fuse(): any {
+    fuse(): never {
         throw new Error("Method `fuse` is not implemented.");
     }
 
-    inspect<F extends (a: Item) => void>(f: F): any {
+    inspect<F extends (a: Item) => void>(f: F): never {
         throw new Error("Method `inspect` is not implemented.");
     }
 
-    intersperse(separator: Item): any {
+    intersperse(separator: Item): never {
         throw new Error("Method `intersperse` is not implemented.");
     }
 
-    intersperseWith<G extends () => Item>(separator: G): any {
+    intersperseWith<G extends () => Item>(separator: G): never {
         throw new Error("Method `intersperseWith` is not implemented.");
     }
 
@@ -109,11 +109,11 @@ export abstract class StdIterator<Item> implements Iterable<Item> {
         return last;
     }
 
-    map<B, F extends (a: Item) => B>(f: F): any {
+    map<B, F extends (a: Item) => B>(f: F): never {
         throw new Error("Method `map` is not implemented.");
     }
 
-    mapWhile<B, F extends (a: Item) => Option<B>>(f: F): any {
+    mapWhile<B, F extends (a: Item) => Option<B>>(f: F): never {
         throw new Error("Method `mapWhile` is not implemented.");
     }
 
@@ -121,7 +121,7 @@ export abstract class StdIterator<Item> implements Iterable<Item> {
         throw new Error("Method `mapWindows` is not implemented.");
     }
 
-    next(): any {
+    next(): Option<Item> {
         throw new Error("Method `next` is not implemented.");
     }
 
@@ -134,7 +134,7 @@ export abstract class StdIterator<Item> implements Iterable<Item> {
         return this.next();
     }
 
-    peekable(): any {
+    peekable(): never {
         throw new Error("Method `peekable` is not implemented.");
     }
 
@@ -148,15 +148,15 @@ export abstract class StdIterator<Item> implements Iterable<Item> {
         return [left, right];
     }
 
-    scan<B, F extends (b: B, a: Item) => B>(init: B, f: F): any {
+    scan<B, F extends (b: B, a: Item) => B>(init: B, f: F): never {
         throw new Error("Method `scan` is not implemented.");
     }
 
-    skip(n: number): any {
+    skip(n: number): never {
         throw new Error("Method `skip` is not implemented.");
     }
 
-    skipWhile<P extends (a: Item) => boolean>(predicate: P): any {
+    skipWhile<P extends (a: Item) => boolean>(predicate: P): never {
         throw new Error("Method `skipWhile` is not implemented.");
     }
 
@@ -164,19 +164,19 @@ export abstract class StdIterator<Item> implements Iterable<Item> {
         return [0, null];
     }
 
-    stepBy(n: number): any {
+    stepBy(n: number): never {
         throw new Error("Method `stepBy` is not implemented.");
     }
 
-    take(n: number): any {
+    take(n: number): never {
         throw new Error("Method `take` is not implemented.");
     }
 
-    takeWhile<P extends (a: Item) => boolean>(predicate: P): any {
+    takeWhile<P extends (a: Item) => boolean>(predicate: P): never {
         throw new Error("Method `takeWhile` is not implemented.");
     }
 
-    zip<U extends Iterable<Item>>(other: U): any {
+    zip<U extends Iterable<Item>>(other: U): never {
         throw new Error("Method `zip` is not implemented.");
     }
 }

@@ -233,12 +233,12 @@ interface IterTraits<T> extends
 
 
 @staticImplements<Default>
-export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
-    public head: Option<Node<T>>;
-    public tail: Option<Node<T>>;
+export class Iter<Item> extends StdIterator<Item> implements IterTraits<Item> {
+    public head: Option<Node<Item>>;
+    public tail: Option<Node<Item>>;
     public length: number;
 
-    constructor(list: ListLike<T>) {
+    constructor(list: ListLike<Item>) {
         super();
         this.head = list.head;
         this.tail = list.tail;
@@ -258,7 +258,7 @@ export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
         return [void 0, null];
     }
 
-    nth(n: number): Option<T> {
+    nth(n: number): Option<Item> {
         let [_, err] = this.advanceBy(n);
         if (err !== null) {
             return null;
@@ -266,7 +266,7 @@ export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
         return this.next();
     }
 
-    any(f: (x: T) => boolean): boolean {
+    any(f: (x: Item) => boolean): boolean {
         let head = this.head;
         while (head !== null) {
             if (f(head.element)) {
@@ -277,7 +277,7 @@ export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
         return false;
     }
 
-    enumerate(): Enumerate<T, this> {
+    enumerate(): Enumerate<Item, this> {
         return new Enumerate(this);
     }
 
@@ -285,7 +285,7 @@ export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
      * Clone
      */
 
-    clone(): Iter<T> {
+    clone(): Iter<Item> {
         return deepClone(this);
     }
 
@@ -311,7 +311,7 @@ export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
      * BasicIterator
      */
 
-    next(): Option<T> {
+    next(): Option<Item> {
         if (this.length === 0) {
             return null;
         } else {
@@ -327,11 +327,11 @@ export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
         return [this.length, this.length!];
     }
 
-    last(): Option<T> {
+    last(): Option<Item> {
         return this.tail?.map(Node.intoElement) ?? null;
     }
 
-    *[Symbol.iterator](): Generator<T> {
+    *[Symbol.iterator](): Generator<Item> {
         let head = this.head;
         while (head !== null) {
             yield head.element;
@@ -343,7 +343,7 @@ export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
      * DoubleEndedIterator
      */
 
-    nextBack(): Option<T> {
+    nextBack(): Option<Item> {
         if (this.length === 0) {
             return null;
         } else {
@@ -364,7 +364,7 @@ export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
         return [void 0, null];
     }
 
-    nthBack(n: number): Option<T> {
+    nthBack(n: number): Option<Item> {
         let [res, err] = this.advanceBackBy(n);
         if (err !== null) {
             return null;
@@ -372,9 +372,9 @@ export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
         return this.nextBack();
     }
 
-    rfold<B>(init: B, f: (b: B, a: T) => B): B {
+    rfold<B>(init: B, f: (b: B, a: Item) => B): B {
         let accum = init;
-        let x: Option<T>;
+        let x: Option<Item>;
         while (true) {
             x = this.nextBack();
             if (x === null) {
@@ -385,8 +385,8 @@ export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
         return accum;
     }
 
-    rfind<P extends (a: T) => boolean>(predicate: P): Option<T> {
-        let x: Option<T>;
+    rfind<P extends (a: Item) => boolean>(predicate: P): Option<Item> {
+        let x: Option<Item>;
         while (true) {
             x = this.nextBack();
             if (x === null) {
