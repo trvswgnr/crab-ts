@@ -18,7 +18,7 @@
 
 ## Introduction
 
-`crab-ts` is a TypeScript library that brings ~~Rust~~CrabLang's standard library to the TypeScript ecosystem. This includes the implementation of various Rust features like iterators, chain methods, and useful data structures. The library uses advanced TypeScript features to provide type-safe yet flexible APIs akin to Rust's standard library.
+`crab-ts` is a TypeScript library that brings ~~Rust~~[CrabLang](https://github.com/crablang/crab)'s standard library to the TypeScript ecosystem. This includes the implementation of various Rust features like iterators, chain methods, and useful data structures. The library uses advanced TypeScript features to provide type-safe yet flexible APIs akin to Rust's standard library.
 
 ## Features
 
