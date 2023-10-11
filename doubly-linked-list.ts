@@ -1,8 +1,10 @@
-import { Clone, Debug, Extend, Default, BasicIterator, DoubleEndedIterator, Result } from "./traits";
+import { Clone, Debug, Extend, Default, BasicIterator, DoubleEndedIterator, Result, Rev, Option, staticImplements } from "./traits";
+import { deepClone } from "./deep-clone";
+import { StdIterator } from "./iterator";
 
-export type Option<T> = T | null;
 
-export class LinkedList<T> implements Clone<LinkedList<T>>, Debug, Extend<T>, Default<LinkedList<T>> {
+@staticImplements<Default>
+export class LinkedList<T> implements Clone<LinkedList<T>>, Debug, Extend<T> {
     head: Option<Node<T>>;
     tail: Option<Node<T>>;
     length: number;
@@ -76,20 +78,20 @@ export class LinkedList<T> implements Clone<LinkedList<T>>, Debug, Extend<T>, De
 
     pushFront(elt: T): void {
         let node = new Node(elt);
-        this.pushFrontNode(node);
+        pushFrontNode(this, node);
     }
 
     popFront(): Option<T> {
-        return this.popFrontNode()?.map(Node.intoElement) ?? null;
+        return popFrontNode(this)?.map(Node.intoElement) ?? null;
     }
 
     pushBack(elt: T): void {
         let node = new Node(elt);
-        this.pushBackNode(node);
+        pushBackNode(this, node);
     }
 
     popBack(): Option<T> {
-        return this.popBackNode()?.map(Node.intoElement) ?? null;
+        return popBackNode(this)?.map(Node.intoElement) ?? null;
     }
 
     splitOff(at: number): LinkedList<T> {
@@ -116,7 +118,7 @@ export class LinkedList<T> implements Clone<LinkedList<T>>, Debug, Extend<T>, De
             }
             splitNode = iter.tail;
         }
-        return this.splitOffAfterNode(splitNode, at);
+        return splitOffAfterNode(this, splitNode, at);
     }
 
     remove(at: number): T {
@@ -150,13 +152,7 @@ export class LinkedList<T> implements Clone<LinkedList<T>>, Debug, Extend<T>, De
      * Implements the Clone trait.
      */
     clone(): LinkedList<T> {
-        let cloned = new LinkedList<T>();
-        let it = this.head;
-        while (it !== null) {
-            cloned.pushBack(it.element);
-            it = it.next;
-        }
-        return cloned;
+        return deepClone(this);
     }
 
     /**
@@ -194,93 +190,8 @@ export class LinkedList<T> implements Clone<LinkedList<T>>, Debug, Extend<T>, De
     /**
      * Implements the Default trait.
      */
-    default(): LinkedList<T> {
+    static default<T>(): LinkedList<T> {
         return new LinkedList<T>();
-    }
-
-    /* private methods */
-    private pushFrontNode(node: Node<T>): void {
-        node.next = this.head;
-        node.prev = null;
-        if (this.head === null) {
-            this.tail = node;
-        } else {
-            this.head.prev = node;
-        }
-        this.head = node;
-        this.length += 1;
-    }
-
-    private popFrontNode(): Option<Node<T>> {
-        if (this.head === null) {
-            return null;
-        }
-
-        return this.head.map((node) => {
-            this.head = node.next;
-            if (this.head === null) {
-                this.tail = null;
-            } else {
-                this.head.prev = null;
-            }
-            this.length -= 1;
-            return node;
-        });
-    }
-
-    private pushBackNode(node: Node<T>): void {
-        node.next = null;
-        node.prev = this.tail;
-        if (this.tail === null) {
-            this.head = node;
-        } else {
-            this.tail.next = node;
-        }
-        this.tail = node;
-        this.length += 1;
-    }
-
-    private popBackNode(): Option<Node<T>> {
-        if (this.tail === null) {
-            return null;
-        }
-        return this.tail.map((node) => {
-            this.tail = node.prev;
-            if (this.tail === null) {
-                this.head = null;
-            } else {
-                this.tail.next = null;
-            }
-            this.length -= 1;
-            return node;
-        });
-    }
-
-    private splitOffAfterNode(splitNode: Option<Node<T>>, at: number): LinkedList<T> {
-        if (splitNode) {
-            let secondPartHead: Option<Node<T>>;
-            let secondPartTail: Option<Node<T>>;
-            secondPartHead = splitNode.next ?? null;
-
-            if (secondPartHead) {
-                secondPartHead.prev = null;
-                secondPartTail = this.tail;
-            } else {
-                secondPartTail = null;
-            }
-
-            let secondPart = new LinkedList<T>();
-            secondPart.head = secondPartHead;
-            secondPart.tail = secondPartTail;
-            secondPart.length = this.length - at;
-
-            this.tail = splitNode;
-            this.length = at;
-
-            return secondPart;
-        }
-
-        return this;
     }
 }
 
@@ -308,16 +219,51 @@ export class Node<T> {
     }
 }
 
+interface ListLike<T> {
+    head: Option<Node<T>>;
+    tail: Option<Node<T>>;
+    length: number;
+}
 
-export class Iter<T> implements Iterable<T>, Clone<Iter<T>>, Debug, Default<Iter<T>>, BasicIterator<T>, DoubleEndedIterator<T> {
+
+interface IterTraits<T> extends
+    Clone<Iter<T>>,
+    Debug,
+    DoubleEndedIterator<T> { }
+
+
+@staticImplements<Default>
+export class Iter<T> extends StdIterator<T> implements IterTraits<T> {
     public head: Option<Node<T>>;
     public tail: Option<Node<T>>;
     public length: number;
 
-    constructor(list: LinkedList<T>) {
+    constructor(list: ListLike<T>) {
+        super();
         this.head = list.head;
         this.tail = list.tail;
         this.length = list.length;
+    }
+
+    count(): number {
+        return this.length;
+    }
+
+    advanceBy(n: number): Result<void, number> {
+        for (let i = 0; i < n; i++) {
+            if (this.next() === null) {
+                return [null, n - i];
+            }
+        }
+        return [void 0, null];
+    }
+
+    nth(n: number): Option<T> {
+        let [_, err] = this.advanceBy(n);
+        if (err !== null) {
+            return null;
+        }
+        return this.next();
     }
 
     any(f: (x: T) => boolean): boolean {
@@ -340,15 +286,7 @@ export class Iter<T> implements Iterable<T>, Clone<Iter<T>>, Debug, Default<Iter
      */
 
     clone(): Iter<T> {
-        const list = new LinkedList<T>();
-        let current = this.head;
-
-        while (current !== null) {
-            list.pushBack(current.element);
-            current = current.next;
-        }
-
-        return new Iter(list);
+        return deepClone(this);
     }
 
     /*
@@ -465,7 +403,7 @@ export class Iter<T> implements Iterable<T>, Clone<Iter<T>>, Debug, Default<Iter
      * Default
      */
 
-    default(): Iter<T> {
+    static default<T>(): Iter<T> {
         return new Iter(new LinkedList<T>());
     }
 }
@@ -587,6 +525,93 @@ export class Cursor<T> {
         unlinkNode(this.list, unlinkedNode);
         return unlinkedNode.element;
     }
+}
+
+
+/* private functions */
+
+function pushFrontNode<T>(list: LinkedList<T>, node: Node<T>): void {
+    node.next = list.head;
+    node.prev = null;
+    if (list.head === null) {
+        list.tail = node;
+    } else {
+        list.head.prev = node;
+    }
+    list.head = node;
+    list.length += 1;
+}
+
+function popFrontNode<T>(list: LinkedList<T>): Option<Node<T>> {
+    if (list.head === null) {
+        return null;
+    }
+
+    return list.head.map((node) => {
+        list.head = node.next;
+        if (list.head === null) {
+            list.tail = null;
+        } else {
+            list.head.prev = null;
+        }
+        list.length -= 1;
+        return node;
+    });
+}
+
+function pushBackNode<T>(list: LinkedList<T>, node: Node<T>): void {
+    node.next = null;
+    node.prev = list.tail;
+    if (list.tail === null) {
+        list.head = node;
+    } else {
+        list.tail.next = node;
+    }
+    list.tail = node;
+    list.length += 1;
+}
+
+function popBackNode<T>(list: LinkedList<T>): Option<Node<T>> {
+    if (list.tail === null) {
+        return null;
+    }
+    return list.tail.map((node) => {
+        list.tail = node.prev;
+        if (list.tail === null) {
+            list.head = null;
+        } else {
+            list.tail.next = null;
+        }
+        list.length -= 1;
+        return node;
+    });
+}
+
+function splitOffAfterNode<T>(list: LinkedList<T>, splitNode: Option<Node<T>>, at: number): LinkedList<T> {
+    if (splitNode) {
+        let secondPartHead: Option<Node<T>>;
+        let secondPartTail: Option<Node<T>>;
+        secondPartHead = splitNode.next ?? null;
+
+        if (secondPartHead) {
+            secondPartHead.prev = null;
+            secondPartTail = list.tail;
+        } else {
+            secondPartTail = null;
+        }
+
+        let secondPart = new LinkedList<T>();
+        secondPart.head = secondPartHead;
+        secondPart.tail = secondPartTail;
+        secondPart.length = list.length - at;
+
+        list.tail = splitNode;
+        list.length = at;
+
+        return secondPart;
+    }
+
+    return list;
 }
 
 function unlinkNode<T>(list: LinkedList<T>, node: Node<T>): void {

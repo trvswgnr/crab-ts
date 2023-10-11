@@ -1,4 +1,5 @@
-import { LinkedList, Node, type Option } from "./doubly-linked-list";
+import { LinkedList, Node } from "./doubly-linked-list";
+import { type Option } from "./traits";
 import { expect, test } from "bun:test";
 
 function generateTest(): LinkedList<number> {
@@ -177,6 +178,48 @@ test("iterator clone", () => {
     expect(it.next()).toBe(jt.next());
     expect(it.nextBack()).toBe(jt.nextBack());
     expect(it.next()).toBe(jt.next());
+
+    let m = new LinkedList<{ value: number }>();
+    m.pushBack({ value: 2 });
+    m.pushBack({ value: 3 });
+    m.pushBack({ value: 4 });
+    let it2 = m.iter();
+    it2.next();
+    let jt2 = it2.clone();
+    expect(it2).not.toBe(jt2);
+    expect(it2.head).not.toBe(jt2.head);
+    expect(it2.head).toEqual(jt2.head);
+    expect(it2.next()).not.toBe(jt2.next());
+    expect(it2.next()).toEqual(jt2.next());
+
+    class Foo {
+        constructor(public value: number) { }
+        double() {
+            this.value *= 2;
+        }
+        getValue() {
+            return this.value;
+        }
+    }
+    let o = new LinkedList<Foo>();
+    o.pushBack(new Foo(2));
+    o.pushBack(new Foo(3));
+    o.pushBack(new Foo(4));
+    let it3 = o.iter();
+    it3.next();
+    let jt3 = it3.clone();
+    expect(it3).not.toBe(jt3);
+    expect(it3.head).not.toBe(jt3.head);
+    expect(it3.head).toEqual(jt3.head);
+    expect(it3.next()).not.toBe(jt3.next());
+    let itNext = it3.next();
+    let jtNext = jt3.next();
+    expect(itNext).toEqual(jtNext);
+    expect(itNext).not.toBe(jtNext);
+    expect(itNext?.getValue()).toBe(jtNext?.getValue());
+    itNext?.double();
+    expect(itNext?.getValue()).toBe(8);
+    expect(jtNext?.getValue()).toBe(4);
 });
 
 test("iterator double end", () => {
@@ -195,3 +238,10 @@ test("iterator double end", () => {
     expect(it.nextBack()).toBe(null);
     expect(it.next()).toBe(null);
 });
+
+// test("rev iter", () => {
+//     let m = generateTest();
+//     for (const [i, elt] of m.iter().rev().enumerate()) {
+//         expect(
+//     }
+// });
