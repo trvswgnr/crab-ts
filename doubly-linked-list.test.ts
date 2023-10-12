@@ -116,7 +116,7 @@ test("append", () => {
     checkLinks(n);
 });
 
-function checkLinks<T>(list: & DoublyLinkedList<T>) {
+function checkLinks<T>(list: DoublyLinkedList<T>) {
     let len = 0;
     let last: Option<Node<T>> = null;
     let node: Node<T>;
