@@ -1,13 +1,13 @@
-import { LinkedList, Node } from "./doubly-linked-list";
+import { DoublyLinkedList, Node } from "./doubly-linked-list";
 import { type Option } from "./traits";
 import { expect, test } from "bun:test";
 
-function generateTest(): LinkedList<number> {
+function generateTest(): DoublyLinkedList<number> {
     return listFrom([0, 1, 2, 3, 4, 5, 6]);
 }
 
-function listFrom<T>(arr: T[]): LinkedList<T> {
-    let m = new LinkedList<T>();
+function listFrom<T>(arr: T[]): DoublyLinkedList<T> {
+    let m = new DoublyLinkedList<T>();
     for (let i = 0; i < arr.length; i++) {
         m.pushBack(arr[i]);
     }
@@ -15,7 +15,7 @@ function listFrom<T>(arr: T[]): LinkedList<T> {
 }
 
 test("basic", () => {
-    let m = new LinkedList<number>();
+    let m = new DoublyLinkedList<number>();
     expect(m.popFront()).toBe(null);
     expect(m.popBack()).toBe(null);
     expect(m.popFront()).toBe(null);
@@ -34,7 +34,7 @@ test("basic", () => {
     m.pushBack(7);
     expect(m.popFront()).toBe(1);
 
-    let n = new LinkedList<number>();
+    let n = new DoublyLinkedList<number>();
     n.pushFront(2);
     n.pushFront(3);
     expect(n.front()!).toBe(3);
@@ -46,7 +46,7 @@ test("basic", () => {
 });
 
 test("pushBack", () => {
-    let m = new LinkedList<number>();
+    let m = new DoublyLinkedList<number>();
     m.pushBack(1);
     m.pushBack(2);
     m.pushBack(3);
@@ -56,7 +56,7 @@ test("pushBack", () => {
     expect(m.popFront()).toBe(3);
     expect(m.len()).toBe(0);
 
-    let n = new LinkedList<number>();
+    let n = new DoublyLinkedList<number>();
     n.pushBack(1);
     n.pushBack(2);
     n.pushBack(3);
@@ -73,8 +73,8 @@ test("pushBack", () => {
 test("append", () => {
     // empty to empy
     {
-        let m = new LinkedList<number>();
-        let n = new LinkedList<number>();
+        let m = new DoublyLinkedList<number>();
+        let n = new DoublyLinkedList<number>();
         m.append(n);
         checkLinks(m);
         expect(m.len()).toBe(0);
@@ -83,8 +83,8 @@ test("append", () => {
 
     // non-empty to empty
     {
-        let m = new LinkedList<number>();
-        let n = new LinkedList<number>();
+        let m = new DoublyLinkedList<number>();
+        let n = new DoublyLinkedList<number>();
         n.pushBack(2);
         expect(n.len()).toBe(1);
         m.append(n);
@@ -116,7 +116,7 @@ test("append", () => {
     checkLinks(n);
 });
 
-function checkLinks<T>(list: & LinkedList<T>) {
+function checkLinks<T>(list: & DoublyLinkedList<T>) {
     let len = 0;
     let last: Option<Node<T>> = null;
     let node: Node<T>;
@@ -155,7 +155,7 @@ test("iterator", () => {
     for (const [i, elt] of m.iter().enumerate()) {
         expect(i).toBe(elt);
     }
-    let n = new LinkedList<number>();
+    let n = new DoublyLinkedList<number>();
     expect(n.iter().next()).toBe(null);
     n.pushFront(4);
     let it = n.iter();
@@ -166,7 +166,7 @@ test("iterator", () => {
 });
 
 test("iterator clone", () => {
-    let n = new LinkedList<number>();
+    let n = new DoublyLinkedList<number>();
     n.pushBack(2);
     n.pushBack(3);
     n.pushBack(4);
@@ -179,7 +179,7 @@ test("iterator clone", () => {
     expect(it.nextBack()).toBe(jt.nextBack());
     expect(it.next()).toBe(jt.next());
 
-    let m = new LinkedList<{ value: number }>();
+    let m = new DoublyLinkedList<{ value: number }>();
     m.pushBack({ value: 2 });
     m.pushBack({ value: 3 });
     m.pushBack({ value: 4 });
@@ -201,7 +201,7 @@ test("iterator clone", () => {
             return this.value;
         }
     }
-    let o = new LinkedList<Foo>();
+    let o = new DoublyLinkedList<Foo>();
     o.pushBack(new Foo(2));
     o.pushBack(new Foo(3));
     o.pushBack(new Foo(4));
@@ -223,7 +223,7 @@ test("iterator clone", () => {
 });
 
 test("iterator double end", () => {
-    let n = new LinkedList<number>();
+    let n = new DoublyLinkedList<number>();
     expect(n.iter().next()).toBe(null);
     n.pushFront(4);
     n.pushFront(5);

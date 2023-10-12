@@ -2,9 +2,8 @@ import { Clone, Debug, Extend, Default, BasicIterator, DoubleEndedIterator, Resu
 import { deepClone } from "./deep-clone";
 import { StdIterator } from "./iterator";
 
-
 @staticImplements<Default>
-export class LinkedList<T> implements Clone<LinkedList<T>>, Debug, Extend<T> {
+export class DoublyLinkedList<T> implements Clone<DoublyLinkedList<T>>, Debug, Extend<T> {
     head: Option<Node<T>>;
     tail: Option<Node<T>>;
     length: number;
@@ -15,11 +14,11 @@ export class LinkedList<T> implements Clone<LinkedList<T>>, Debug, Extend<T> {
         this.length = 0;
     }
 
-    static new<T>(): LinkedList<T> {
-        return new LinkedList<T>();
+    static new<T>(): DoublyLinkedList<T> {
+        return new DoublyLinkedList<T>();
     }
 
-    append(other: LinkedList<T>): void {
+    append(other: DoublyLinkedList<T>): void {
         if (!this.tail) {
             this.head = other.head;
             this.tail = other.tail;
@@ -94,14 +93,14 @@ export class LinkedList<T> implements Clone<LinkedList<T>>, Debug, Extend<T> {
         return popBackNode(this)?.map(Node.intoElement) ?? null;
     }
 
-    splitOff(at: number): LinkedList<T> {
+    splitOff(at: number): DoublyLinkedList<T> {
         let len = this.len();
         if (!(at <= len)) throw new Error("Cannot split off at a nonexistent index");
 
         if (at === 0) {
             return this;
         } else if (at === len) {
-            return new LinkedList<T>();
+            return new DoublyLinkedList<T>();
         }
 
         let splitNode: Option<Node<T>> = null;
@@ -151,7 +150,7 @@ export class LinkedList<T> implements Clone<LinkedList<T>>, Debug, Extend<T> {
     /**
      * Implements the Clone trait.
      */
-    clone(): LinkedList<T> {
+    clone(): DoublyLinkedList<T> {
         return deepClone(this);
     }
 
@@ -190,8 +189,8 @@ export class LinkedList<T> implements Clone<LinkedList<T>>, Debug, Extend<T> {
     /**
      * Implements the Default trait.
      */
-    static default<T>(): LinkedList<T> {
-        return new LinkedList<T>();
+    static default<T>(): DoublyLinkedList<T> {
+        return new DoublyLinkedList<T>();
     }
 }
 
@@ -404,7 +403,7 @@ export class Iter<Item> extends StdIterator<Item> implements IterTraits<Item> {
      */
 
     static default<T>(): Iter<T> {
-        return new Iter(new LinkedList<T>());
+        return new Iter(new DoublyLinkedList<T>());
     }
 }
 
@@ -431,13 +430,13 @@ export class ExtractIf<
     T,
     F extends (x: T) => boolean,
 > {
-    list: LinkedList<T>;
+    list: DoublyLinkedList<T>;
     it: Option<Node<T>>;
     pred: F;
     idx: number;
     old_len: number;
 
-    constructor(list: LinkedList<T>, it: Option<Node<T>>, pred: F, idx: number, old_len: number) {
+    constructor(list: DoublyLinkedList<T>, it: Option<Node<T>>, pred: F, idx: number, old_len: number) {
         this.list = list;
         this.it = it;
         this.pred = pred;
@@ -457,7 +456,7 @@ export class Cursor<T> {
     constructor(
         private idx: number,
         private curr: Option<Node<T>>,
-        private list: LinkedList<T>
+        private list: DoublyLinkedList<T>
     ) { }
 
     index(): Option<number> {
@@ -530,7 +529,7 @@ export class Cursor<T> {
 
 /* private functions */
 
-function pushFrontNode<T>(list: LinkedList<T>, node: Node<T>): void {
+function pushFrontNode<T>(list: DoublyLinkedList<T>, node: Node<T>): void {
     node.next = list.head;
     node.prev = null;
     if (list.head === null) {
@@ -542,7 +541,7 @@ function pushFrontNode<T>(list: LinkedList<T>, node: Node<T>): void {
     list.length += 1;
 }
 
-function popFrontNode<T>(list: LinkedList<T>): Option<Node<T>> {
+function popFrontNode<T>(list: DoublyLinkedList<T>): Option<Node<T>> {
     if (list.head === null) {
         return null;
     }
@@ -559,7 +558,7 @@ function popFrontNode<T>(list: LinkedList<T>): Option<Node<T>> {
     });
 }
 
-function pushBackNode<T>(list: LinkedList<T>, node: Node<T>): void {
+function pushBackNode<T>(list: DoublyLinkedList<T>, node: Node<T>): void {
     node.next = null;
     node.prev = list.tail;
     if (list.tail === null) {
@@ -571,7 +570,7 @@ function pushBackNode<T>(list: LinkedList<T>, node: Node<T>): void {
     list.length += 1;
 }
 
-function popBackNode<T>(list: LinkedList<T>): Option<Node<T>> {
+function popBackNode<T>(list: DoublyLinkedList<T>): Option<Node<T>> {
     if (list.tail === null) {
         return null;
     }
@@ -587,7 +586,7 @@ function popBackNode<T>(list: LinkedList<T>): Option<Node<T>> {
     });
 }
 
-function splitOffAfterNode<T>(list: LinkedList<T>, splitNode: Option<Node<T>>, at: number): LinkedList<T> {
+function splitOffAfterNode<T>(list: DoublyLinkedList<T>, splitNode: Option<Node<T>>, at: number): DoublyLinkedList<T> {
     if (splitNode) {
         let secondPartHead: Option<Node<T>>;
         let secondPartTail: Option<Node<T>>;
@@ -600,7 +599,7 @@ function splitOffAfterNode<T>(list: LinkedList<T>, splitNode: Option<Node<T>>, a
             secondPartTail = null;
         }
 
-        let secondPart = new LinkedList<T>();
+        let secondPart = new DoublyLinkedList<T>();
         secondPart.head = secondPartHead;
         secondPart.tail = secondPartTail;
         secondPart.length = list.length - at;
@@ -614,7 +613,7 @@ function splitOffAfterNode<T>(list: LinkedList<T>, splitNode: Option<Node<T>>, a
     return list;
 }
 
-function unlinkNode<T>(list: LinkedList<T>, node: Node<T>): void {
+function unlinkNode<T>(list: DoublyLinkedList<T>, node: Node<T>): void {
     if (node.prev) {
         node.prev.next = node.next;
     } else {

@@ -1,5 +1,4 @@
 import { Default, Option, staticImplements } from './traits';
-import { StdIterator } from './iterator';
 
 @staticImplements<Default>
 export class Chain<Item, A extends Iterable<Item> = Iterable<Item>, B extends Iterable<Item> = Iterable<Item>> {
