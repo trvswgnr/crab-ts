@@ -1,5 +1,5 @@
-import { Default, Extend, Option, Result, IntoIterator } from './traits.ts';
-import { Chain } from './chain.ts';
+import { Default, Extend, Option, Result } from "./traits/traits.ts";
+import { Chain } from "./chain.ts";
 
 type AnyClass = abstract new (...args: any[]) => any;
 
@@ -35,11 +35,11 @@ export abstract class StdIterator<Item> implements Iterable<Item> {
         return new Chain(this, other.iter());
     }
 
-    collect<B extends any>(): B {
+    collect<B>(): B {
         throw new Error("Method `collect` is not implemented.");
     }
 
-    collectInto<E extends any>(collection: E): E {
+    collectInto<E>(collection: E): E {
         throw new Error("Method `collectInto` is not implemented.");
     }
 
@@ -142,8 +142,8 @@ export abstract class StdIterator<Item> implements Iterable<Item> {
         if (typeof BClass === "string") {
             throw new Error(`Type ${BClass} does not implement \`Extend\` trait.`);
         }
-        let left: InstanceType<B> & Extend<Item> = BClass.default<B>();
-        let right: InstanceType<B> & Extend<Item> = BClass.default<B>();
+        const left: InstanceType<B> & Extend<Item> = BClass.default<B>();
+        const right: InstanceType<B> & Extend<Item> = BClass.default<B>();
         this.fold(void 0, extend(f, left, right));
         return [left, right];
     }

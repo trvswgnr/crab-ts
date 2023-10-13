@@ -1,4 +1,4 @@
-import { Clone, Debug, Extend, Default, BasicIterator, DoubleEndedIterator, Result, Rev, Option, staticImplements } from "./traits";
+import { Clone, Debug, Extend, Default, BasicIterator, DoubleEndedIterator, Result, Rev, Option, staticImplements } from "./traits/traits";
 import { deepClone } from "./deep-clone";
 import { StdIterator } from "./iterator";
 

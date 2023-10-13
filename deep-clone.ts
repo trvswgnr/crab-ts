@@ -3,7 +3,7 @@ export function deepClone<T>(value: T, map = new WeakMap()): T {
         return value;
     }
 
-    if (typeof value !== 'object' && typeof value !== 'function') {
+    if (typeof value !== "object" && typeof value !== "function") {
         return value;
     }
 

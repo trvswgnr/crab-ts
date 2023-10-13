@@ -1,5 +1,4 @@
-import { Default, Option, staticImplements } from './traits';
-import { StdIterator } from './iterator';
+import { Default, Option, staticImplements } from "./traits/traits";
 
 @staticImplements<Default>
 export class Chain<Item, A extends Iterable<Item> = Iterable<Item>, B extends Iterable<Item> = Iterable<Item>> {
@@ -24,12 +23,8 @@ export class Chain<Item, A extends Iterable<Item> = Iterable<Item>, B extends It
     }
 }
 
-const a = Chain.default<number>();
-console.log(a.next());
-
-
 function andThenOrClear<T, U>(opt: Option<T>, f: (x: T) => Option<U>): Option<U> {
-    let x = f(opt!);
+    const x = f(opt!);
     if (x === null) {
         opt = null;
     }

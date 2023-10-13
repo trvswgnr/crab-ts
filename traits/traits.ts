@@ -1,38 +1,19 @@
 export type Option<T> = T | null;
 export type Result<T, E> = [T, null] | [null, E];
-
-type AnyInstance = { new(...args: any[]): any };
+export type AnyClass = new (...args: any[]) => any;
 
 export interface Clone<T> {
     clone(): T;
 }
 
-export interface Default {
-    default<T extends abstract new (...args: any[]) => any>(): InstanceType<T>
-    default(): unknown;
-}
-
 export interface Debug {
     toString(): string;
 }
+
 export interface Display {
     toString(): string;
 }
-export interface BasicIterator<Item> extends Iterable<Item> {
-    next(): Option<Item>;
-    sizeHint(): [number, Option<number>];
-    count(): number;
-    last(): Option<Item>;
-    advanceBy(n: number): Result<void, number>;
-    nth(n: number): Option<Item>;
-    // stepBy(n: number): StepBy<this>;
-    // chain<U extends Iterable<Item>>(other: U): Chain<this, U>;
-    // zip<U extends Iterable<Item>>(other: U): Zip<this, U>;
-    // intersperse(separator: Item): Intersperse<this>;
-    // intersperseWith<G extends () => Item>(separator: G): IntersperseWith<this, G>;
-    // map<B, F extends (a: Item) => B>(f: F): IMap<this, F>;
-    forEach<F extends (a: Item) => void>(f: F): void;
-}
+
 export interface DoubleEndedIterator<Item> {
     nextBack(): Option<Item>;
     advanceBackBy(n: number): Result<void, number>;
@@ -67,10 +48,13 @@ export function methodStaticImplements(method: any): TypedPropertyDescriptor<any
     };
 }
 
-type Class = new (...args: any[]) => any;
+export interface Default {
+    default<T extends abstract new (...args: any[]) => any>(): InstanceType<T>
+    default(): unknown;
+}
 export class Default {
-    static default<T extends Class>(ctor: T): InstanceType<T> {
-        if ('default' in ctor && typeof ctor.default === 'function') {
+    static default<T extends AnyClass>(ctor: T): InstanceType<T> {
+        if ("default" in ctor && typeof ctor.default === "function") {
             return ctor.default();
         }
         try {
@@ -79,4 +63,8 @@ export class Default {
             throw new Error(`Type ${ctor.name} does not implement static \`default\` method, and cannot be instantiated withpout arguments.`);
         }
     }
+}
+
+export interface ToString {
+    toString(): string;
 }

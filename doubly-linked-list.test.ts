@@ -1,5 +1,5 @@
 import { LinkedList, Node } from "./doubly-linked-list";
-import { type Option } from "./traits";
+import { type Option } from "./traits/traits";
 import { expect, test } from "bun:test";
 
 function generateTest(): LinkedList<number> {
